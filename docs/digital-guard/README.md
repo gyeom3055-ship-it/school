@@ -36,6 +36,7 @@
 | 13 | 기능별 우선순위와 제작 로드맵 | [09-roadmap-and-tests.md](09-roadmap-and-tests.md#13-기능별-우선순위와-제작-로드맵) |
 | 14 | 테스트 시나리오와 완료 기준 | [09-roadmap-and-tests.md](09-roadmap-and-tests.md#14-테스트-시나리오와-완료-기준) |
 | 부록 | 보안 규칙 목록 · 용어 사전 · 가상 데이터 작성 원칙 | [10-appendix.md](10-appendix.md) |
+| 발표 | 게임 기획 발표 PPT (16:9, 9장, 슬라이드 노트 포함) | [presentation/DIGITAL_GUARD_기획발표.pptx](presentation/DIGITAL_GUARD_기획발표.pptx) |
 
 ---
 
