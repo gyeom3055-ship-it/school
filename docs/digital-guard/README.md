@@ -37,7 +37,7 @@
 | 14 | 테스트 시나리오와 완료 기준 | [09-roadmap-and-tests.md](09-roadmap-and-tests.md#14-테스트-시나리오와-완료-기준) |
 | 부록 | 보안 규칙 목록 · 용어 사전 · 가상 데이터 작성 원칙 · 게임 이름 후보 · 확장자 도감 | [10-appendix.md](10-appendix.md) |
 | 시제품 | 도트 스타일 게임 화면 HTML 시제품 (하루치 체험판) | [prototype/digital-guard-pixel.html](prototype/digital-guard-pixel.html) · [만드는 법](prototype/README.md) |
-| 발표 | 게임 기획 발표 PPT (16:9, 9장, 슬라이드 노트 포함) | [presentation/DIGITAL_GUARD_기획발표.pptx](presentation/DIGITAL_GUARD_기획발표.pptx) |
+| 발표 | 게임 기획 발표 PPT (16:9, 9장, 도트 스타일, 슬라이드 노트 포함) | [presentation/DIGITAL_GUARD_기획발표.pptx](presentation/DIGITAL_GUARD_기획발표.pptx) · [글꼴 안내](presentation/README.md) |
 
 ---
 
