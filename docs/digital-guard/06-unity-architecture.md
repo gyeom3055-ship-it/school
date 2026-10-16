@@ -287,7 +287,7 @@ ContentDatabase
  │                     │   └─ correctVerdict, acceptableAlternatives[]
  │                     └─ TopicDefinition 참조[], difficulty 변수
  ├─ RuleDefinition[]  ──▶ RuleCondition[]
- ├─ TopicDefinition[]  ToolDefinition[]  LookupDefinition[]  GlossaryEntry[]
+ ├─ TopicDefinition[]  ToolDefinition[]  LookupDefinition[]  GlossaryEntry[]  FileTypeDefinition[]
  └─ ScoringConfig, StarRule
 ```
 
@@ -329,13 +329,16 @@ ContentDatabase
 | `verifyRoutes` | {id, textKey, isCorrect}[] | Verify 허용 시 ✔ | 확인 경로 보기 | — |
 | `epilogues` | {condition, textKey}[] | | 결과별 후일담 (Correct / OverBlock / RiskApprove) | — |
 | `nextStageOnVerify` | bool | | 추가 확인 정답 시 다음 단계로 진행 | — |
+| `verifyResultKey` | string | Verify 정답 ✔ | 확인 결과 카드 문장 (1단계·2단계 사례 모두 필수, [G4](01-overview.md#33-게임플레이-단계-점검-v02)) | — |
+| `reportable` | bool | Reject 정답 ✔ | 신고 시트의 정답 (`true` = 신고하기, `false` = 안내만 하기) | — |
+| `myRecord` | DocumentRef | ✔ | 👤 내 기록 탭 문서. 요청자가 원래 알던 정보만 담는다 | 관련 정보와 비교 기준 |
 
 #### DocumentDefinition / FieldDefinition
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
 | `documentId` | string | 사례 안에서 유일 (예: `mail`, `domainList`) |
-| `docType` | enum | Mail, ShareRequest, ShareSettings, Roster, Profile, LoginAlert, Schedule, DeviceList, Policy, Form, Notice, PermissionRequest, ContactDirectory, VerifyResult, Message |
+| `docType` | enum | Mail, Sms, ShareRequest, ShareSettings, Roster, Profile, LoginAlert, Schedule, DeviceList, Policy, Form, Notice, PermissionRequest, ContactDirectory, VerifyResult, Message, **FileInfo**, **MyRecord** |
 | `titleKey` | string | 문서 제목 |
 | `fields` | FieldDefinition[] | 표시 순서대로 |
 | `field.fieldId` | string | `{documentId}.{name}` (예: `mail.sender`) — 사례 안에서 유일 |
@@ -368,6 +371,20 @@ ContentDatabase
 | `status` | enum | Known / Unconfirmed / Missing — 정보의 확인 상태 |
 | `sourceFieldIds` | string[] | 이 사실이 표시된 문서 필드 (위험 위치·근거와 연결) |
 
+#### FileTypeDefinition (v0.2 추가)
+
+| 필드 | 타입 | 설명 |
+|---|---|---|
+| `extension` | string | 점을 뺀 소문자 확장자 (예: `zip`, `exe`, `hwp`) |
+| `category` | enum | Document, Image, Media, Archive, Executable, MacroDocument, Shortcut, WebPage, Calendar, Contact, Other |
+| `displayNameKey` | string | "실행 파일 (프로그램)" 같은 쉬운 이름 |
+| `riskNote` | enum | Usually / CheckContext / AvoidUnlessExpected / NeverFromUnknown — 확장자 도감 표시용 안내 등급. **판정은 규칙 조건이 내리며, 이 값만으로 정답을 정하지 않는다** |
+| `glossaryKey` | string | 확장자 도감 설명 |
+| `introducedOnDay` | int | 처음 등장하는 Day (그 전 사례에 쓰이면 검증기 오류) |
+
+- 파일 필드는 `fileName`(화면 표시용, 공백 포함 가능), `lastExtension`(판정용, 검증기가 `fileName`에서 다시 계산해 일치 확인), `sizeLabel`, `archiveEntries[]`(압축일 때)를 가진다.
+- 확장자 목록과 분류는 [부록 E](10-appendix.md#e-확장자-도감-파일-종류)를 원본으로 삼는다.
+
 ### 10.3 사실(Fact) 모델과 조건 유형
 
 판정기는 **자연어를 해석하지 않는다.** 사례 작성자가 문서에 보이는 정보를 구조화된 사실로 함께 입력하고, 판정기는 그 사실과 규칙 조건만 평가한다. 화면의 문장과 사실이 어긋나지 않도록 `sourceFieldIds`로 연결하고 에디터 검증기가 누락을 경고한다.
@@ -386,6 +403,9 @@ ContentDatabase
 | `IdentityConfirmed` | key | `Confirmed` → Pass, `Unconfirmed` → Unknown, `Refuted` → Violation | 운영자·교사 신원 (C2-03, C4-02) |
 | `IsPresent` | key | 사실이 Known 상태로 존재 | 승인자 기록 (C4-01) |
 | `NoForbiddenPublicInfo` | profileKeys[] | 공개 항목에 실명·학교·위치·일정·얼굴 태그 없음 | 공개 프로필 (C3-01) |
+| `ExtensionCategoryNotIn` | fileKey, categories[] | 파일의 *마지막* 확장자가 금지 분류(실행·매크로 문서·바로가기 등)에 속하지 않음 | 실행 파일 거부 (C2-03, C2-06) |
+| `ExtensionMatchesExpected` | fileKey, expectedKey | 마지막 확장자의 분류가 안내·요청된 분류와 같음(문서↔문서는 같은 분류로 본다) | `.pdf` 기대 → `.exe` 수신은 위반, `.hwp` 수신은 통과 (C2-06) |
+| `ArchiveContainsNone` | fileKey, categories[] | 압축 파일의 내용 목록에 금지 분류 파일이 없음 | 사진 압축 승인 (C2-05) |
 
 - **등록 도메인 추출 규칙**: 게임 속 도메인은 모두 `이름.example` 2단 구조이므로, 주소의 **마지막 두 라벨**을 등록 도메인으로 본다. (`baeumteo.login-check.example` → `login-check.example`) 이 단순화는 게임 데이터에만 적용하며, 데이터 검증기가 3단 이상의 등록 도메인(예: `.co.example`)을 금지한다.
 - 조건 결과는 `Pass` / `Violation` / `Unknown` 세 가지다. 사실이 `Unconfirmed` 또는 `Missing`이면 대부분의 조건은 `Unknown`을 낸다.
@@ -427,7 +447,7 @@ ContentDatabase
        (OnStageEnter 문서 공개, facts는 다음 단계 데이터로 교체, 판정 버튼 재구성)
 ```
 
-**10개 골든 사례 판정기 검산**
+**골든 사례 판정기 검산 (14개 사례, 15개 단계)**
 
 | 사례 | 핵심 규칙 결과 | 계산된 판정 | 작성된 정답 | 일치 |
 |---|---|---|---|---|
@@ -442,6 +462,10 @@ ContentDatabase
 | C4-01 | R-PERM-01 Unknown(승인자 Missing) → onUnknown Verify | Verify | 추가 확인 | ✔ |
 | C4-02-S1 | R-ID-01 Unknown(Unconfirmed) → Verify | Verify | 추가 확인 | ✔ |
 | C4-02-S2 | R-ID-01 Violation(Refuted), R-PW-02 Violation(Reject) | Reject | 거부 | ✔ |
+| C2-04 | R-LINK-01 Violation(Reject) | Reject | 거부 | ✔ |
+| C2-05 | R-FILE-03 Pass, R-ID-01 Pass(저장된 연락처 = Confirmed) | Approve | 승인 | ✔ |
+| C2-06 | R-FILE-02 Violation(Reject), R-FILE-01 Violation(Reject) | Reject | 거부 | ✔ |
+| C3-03 | R-ID-01 Unknown(Unconfirmed) → Verify | Verify | 추가 확인 | ✔ |
 
 > `R-ID-01`의 `onViolation`은 `Reject`(신원이 거짓으로 밝혀짐), `onUnknown`은 `Verify`(신원 미확인)이다. 이렇게 하면 C2-03처럼 *공식 정책으로 거짓이 확인되는* 사칭은 거부, C4-02-S1처럼 *아직 확인되지 않은* 신원은 추가 확인으로 일관되게 처리된다.
 
@@ -548,6 +572,10 @@ ContentDatabase
 | 경고 | Day 안에서 같은 정답이 3회 연속 / Day 판정 분포가 [6.4](04-levels-and-scoring.md#64-판정-분포-가이드) 범위에서 15%p 이상 벗어남 |
 | 경고 | `difficultyParams`가 등급 범위를 벗어남 |
 | 경고 | 해설 텍스트에 금지 표현 목록("해킹당", "큰일", "실패" 등) 포함 |
+| 오류 | **문서 텍스트에 정답 암시 문구 포함** — 금지 목록("답장할 필요 없", "안전한 메시지", "이건 진짜", "믿어도 돼" 등)과 일치. 사례별 예외는 사유를 적어 승인해야 함 ([G13](01-overview.md#33-게임플레이-단계-점검-v02)) |
+| 오류 | 첨부 파일의 표시 이름·마지막 확장자·`FileTypeDefinition` 분류·압축 내용 목록이 서로 맞지 않음 |
+| 오류 | Reject 정답인데 `reportable` 미지정 / Verify 정답인데 `verifyResultKey` 없음 / `myRecord` 없음 |
+| 경고 | `myRecord`에 메시지 본문과 같은 문장이 들어 있음(주장과 기록이 섞였을 가능성) |
 
 ### 10.8 템플릿 기반 사례 생성 (P2)
 
@@ -566,7 +594,7 @@ ContentDatabase
 | 단계 | 도구 | 담당 |
 |---|---|---|
 | 1. 사례 기획 | 사례 기획 시트(스프레드시트: 사건 설명·문서·정답·해설) | 기획 |
-| 2. 교육 검수 | 체크리스트([5.11](03-cases.md#511-사례-작성-체크리스트-콘텐츠-제작용)) + 교사·사서 자문 | 기획·자문 |
+| 2. 교육 검수 | 체크리스트([5.12](03-cases.md#512-사례-작성-체크리스트-콘텐츠-제작용)) + 교사·사서 자문 | 기획·자문 |
 | 3. 데이터 입력 | (P0) ScriptableObject 커스텀 인스펙터 / (P1) CSV·JSON 가져오기 도구 | 기획 |
 | 4. 자동 검증 | CaseValidator | 자동 |
 | 5. 플레이 확인 | 에디터의 "이 사례 바로 플레이" 버튼, 두 테마 전환 확인 | 기획·QA |

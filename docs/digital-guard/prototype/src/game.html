@@ -1,0 +1,757 @@
+<title>DIGITAL GUARD 도트 시제품</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a portrait handheld "security terminal" centered on the page; a side manual appears on wide screens. Single dark pixel world (no light theme by design). */
+@font-face{font-family:"GalmuriBody";src:url(data:font/woff2;base64,__FONT_BODY__) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"GalmuriBody";src:url(data:font/woff2;base64,__FONT_BOLD__) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"GalmuriHead";src:url(data:font/woff2;base64,__FONT_HEAD__) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"GalmuriMono";src:url(data:font/woff2;base64,__FONT_MONO__) format("woff2");font-weight:400;font-display:swap}
+:root{
+  color-scheme:dark;
+  --night:#0F1426; --night-2:#151C33; --panel:#1F2A4A; --steel:#3A4E7A; --haze:#7F9CC9;
+  --paper:#F2EBD9; --paper-2:#E3D7BC; --ink:#22201F; --pencil:#6B6560; --hl:#F9E9A6;
+  --yellow:#F7D84A; --yellow-d:#B08E1C; --green:#3FBF6F; --green-d:#23784A; --red:#E0503C; --red-d:#8E2B25;
+  --teal:#45C7C1; --purple:#8A6BD1; --wood:#8A5A3B; --wood-2:#A8714C; --white:#FFFFFF; --muted:#B9C6E2;
+  --f-pixel:"GalmuriBody","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --f-plain:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  --f-body:var(--f-pixel);
+  --f-head:"GalmuriHead","GalmuriBody","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"GalmuriMono",ui-monospace,"D2Coding",Consolas,monospace;
+  --u:3px; --scale:1;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+html{font-size:calc(16px * var(--scale))}
+body{margin:0;background:var(--night);color:var(--white);font-family:var(--f-body);line-height:1.55;overflow:hidden;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0;
+  -webkit-font-smoothing:none;font-smooth:never}
+body.plain-font{--f-body:var(--f-plain);-webkit-font-smoothing:auto}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit;touch-action:manipulation}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+button:disabled{cursor:not-allowed}
+svg.px{display:inline-block;vertical-align:-0.15em;shape-rendering:crispEdges;flex-shrink:0}
+
+/* pixel border: notched corners drawn with four hard shadows */
+.pxb{box-shadow:0 calc(-1*var(--u)) 0 0 var(--bc,var(--steel)),0 var(--u) 0 0 var(--bc,var(--steel)),calc(-1*var(--u)) 0 0 0 var(--bc,var(--steel)),var(--u) 0 0 0 var(--bc,var(--steel))}
+
+.stage{height:100%;display:flex;justify-content:center;gap:36px;padding-block:14px;background-image:radial-gradient(var(--night-2) 2px,transparent 2px);background-size:12px 12px}
+.device{position:relative;width:100%;max-width:430px;height:100%;display:flex;flex-direction:column;background:var(--night-2);--bc:var(--steel);min-height:0;margin-inline:var(--u)}
+.aside{display:none;width:300px;align-self:center;color:var(--muted);font-size:0.875rem}
+.aside h2{font-family:var(--f-head);color:var(--white);font-size:1.25rem;font-weight:400;margin:0 0 10px;text-wrap:balance}
+.aside p{margin:0 0 12px}
+.aside .legend{display:grid;gap:8px;margin:14px 0}
+.aside .legend span{display:flex;gap:10px;align-items:center}
+.aside .note{border-top:2px dashed var(--steel);padding-top:12px;font-size:0.8125rem}
+@media (min-width:900px){.aside{display:block}}
+
+/* top bar */
+.topbar{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--panel);border-bottom:var(--u) solid var(--steel)}
+.lamps{display:flex;gap:5px}
+.lamps i{width:9px;height:9px;display:block}
+.lamps i:nth-child(1){background:var(--red)}.lamps i:nth-child(2){background:var(--green)}.lamps i:nth-child(3){background:var(--yellow)}
+.topbar .where{flex:1;min-width:0;font-size:0.8125rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .where b{color:var(--white);font-weight:700;font-family:var(--f-head);font-size:0.9375rem;margin-right:6px}
+.icon-btn{min-width:44px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 8px;color:var(--muted);font-size:0.8125rem}
+.icon-btn:hover{color:var(--white)}
+
+.condition{flex-shrink:0;display:flex;gap:8px;align-items:center;width:100%;padding:8px 12px;background:#1A2340;border-bottom:2px dashed var(--steel);color:var(--yellow);font-size:0.8125rem;text-align:left}
+.condition span{flex:1;min-width:0;color:var(--paper)}
+.condition b{font-weight:700;color:var(--yellow);white-space:nowrap}
+
+.screen{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:14px 14px 18px;scrollbar-width:thin;scrollbar-color:var(--steel) transparent}
+.dock{flex-shrink:0;background:var(--panel);border-top:var(--u) solid var(--steel);padding:8px 10px 10px}
+
+/* title */
+.title{display:flex;flex-direction:column;gap:18px;min-height:100%;justify-content:center;padding-block:10px}
+.logo{font-family:var(--f-head);font-size:3.4rem;line-height:1;letter-spacing:1px;color:var(--white);text-shadow:var(--u) var(--u) 0 var(--steel);margin:0}
+.logo span{color:var(--teal)}
+.subtitle{font-family:var(--f-head);color:var(--yellow);font-size:1.0625rem;margin:-6px 0 0}
+.hero-scene{display:flex;align-items:flex-end;gap:12px;padding:14px;background:var(--night);--bc:var(--steel)}
+.hero-scene .bubble{flex:1;background:var(--paper);color:var(--ink);padding:10px 12px;--bc:var(--ink);font-size:0.875rem}
+.card{background:var(--panel);padding:12px 14px;--bc:var(--steel)}
+.card h3{margin:0 0 6px;font-family:var(--f-head);font-weight:400;font-size:1rem;color:var(--teal)}
+.nick{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nick b{font-size:1.0625rem;color:var(--white)}
+.small{font-size:0.8125rem;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:10px 16px;font-family:var(--f-head);font-size:1.0625rem;color:var(--ink);background:var(--bf,var(--teal));
+  box-shadow:0 calc(-1*var(--u)) 0 0 var(--ink),calc(-1*var(--u)) 0 0 0 var(--ink),var(--u) 0 0 0 var(--ink),0 var(--u) 0 0 var(--bs,#2A8C88),0 calc(2*var(--u)) 0 0 var(--ink);
+  margin-bottom:calc(2*var(--u));transition:transform .06s}
+.btn:active:not(:disabled){transform:translateY(var(--u));box-shadow:0 calc(-1*var(--u)) 0 0 var(--ink),calc(-1*var(--u)) 0 0 0 var(--ink),var(--u) 0 0 0 var(--ink),0 var(--u) 0 0 var(--ink)}
+.btn.full{width:100%}
+.btn.ghost{--bf:var(--panel);--bs:var(--night);color:var(--white)}
+.btn.yellow{--bf:var(--yellow);--bs:var(--yellow-d)}
+.btn.green{--bf:var(--green);--bs:var(--green-d)}
+.btn.red{--bf:var(--red);--bs:var(--red-d)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > *{flex:1;min-width:0}
+.footnote{font-size:0.75rem;color:var(--haze);text-align:center;margin:0}
+
+/* briefing */
+.brief-day{font-family:var(--f-head);color:var(--muted);font-size:0.875rem;letter-spacing:2px}
+.brief-day b{display:block;font-size:3.2rem;line-height:1.05;color:var(--yellow);letter-spacing:0;font-weight:400}
+.news{display:flex;gap:10px;align-items:flex-start}
+.rulecard{background:var(--paper);color:var(--ink);padding:14px;--bc:var(--ink);position:relative}
+.rulecard .tag{display:inline-block;background:var(--ink);color:var(--paper);font-size:0.75rem;padding:1px 6px;margin-bottom:8px}
+.rulecard h3{margin:0 0 10px;font-family:var(--f-head);font-weight:400;font-size:1.125rem;line-height:1.4;text-wrap:balance}
+.example{display:grid;grid-template-columns:auto 1fr;gap:6px 8px;font-size:0.875rem;align-items:start}
+.example .ok{color:var(--green-d);font-weight:700}.example .no{color:var(--red-d);font-weight:700}
+.term{border-top:2px dashed var(--paper-2);margin-top:10px;padding-top:8px;font-size:0.8125rem;color:var(--pencil)}
+
+/* desk */
+.request{display:flex;gap:10px;align-items:flex-start;background:var(--panel);padding:10px 12px;--bc:var(--steel);margin-bottom:14px}
+.request .who{font-size:0.75rem;color:var(--teal)}
+.request p{margin:2px 0 0;font-size:0.9375rem}
+.avatar{width:36px;height:36px;flex-shrink:0;background:var(--night)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:var(--u) var(--u) 8px;margin:0 calc(-1*var(--u))}
+.tab{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:6px 10px;font-size:0.8125rem;background:var(--night);color:var(--muted);--bc:var(--steel);position:relative}
+.tab[aria-selected="true"]{background:var(--wood-2);color:var(--paper);--bc:var(--ink)}
+.tab .new{width:7px;height:7px;background:var(--yellow);display:inline-block}
+.doc{background:var(--paper);color:var(--ink);--bc:var(--ink);margin-top:2px}
+.doc-head{display:flex;align-items:center;gap:8px;background:var(--wood);color:var(--paper);padding:6px 12px;font-size:0.875rem;border-bottom:var(--u) solid var(--wood-2)}
+.doc-head .kind{margin-left:auto;font-size:0.75rem;opacity:.85}
+.fields{display:flex;flex-direction:column}
+.field{display:block;width:100%;padding:9px 12px;border-bottom:2px dashed var(--paper-2);position:relative;color:var(--ink)}
+.field:last-child{border-bottom:0}
+.field .lbl{display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--pencil)}
+.field .val{display:block;font-size:0.9375rem;white-space:pre-line;overflow-wrap:anywhere;margin-top:1px}
+.field .val.mono{font-family:var(--f-mono);white-space:pre-wrap;font-size:0.875rem}
+.field .marks{margin-left:auto;display:flex;gap:4px}
+.mk{font-size:0.6875rem;padding:0 5px;line-height:1.5;font-family:var(--f-body)}
+.mk.ok{background:var(--green);color:var(--ink)}.mk.bad{background:var(--yellow);color:var(--ink)}.mk.flag{background:var(--red);color:var(--white)}.mk.risk{background:var(--ink);color:var(--yellow)}
+.field.sel{background:var(--hl);outline:var(--u) solid var(--ink);outline-offset:calc(-1*var(--u))}
+.field.flagged{background:#F6D9CF}
+.field.risk-show{background:#F6D9CF;outline:var(--u) dashed var(--red-d);outline-offset:calc(-1*var(--u))}
+.mode-on .field:not(:disabled){cursor:crosshair}
+.field .open-file{display:inline-flex;margin-top:6px;font-size:0.75rem;background:var(--ink);color:var(--paper);padding:2px 8px}
+.tray{margin-top:16px}
+.tray h4{margin:0 0 6px;font-size:0.75rem;color:var(--haze);font-weight:400;letter-spacing:1px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;font-size:0.75rem;line-height:1.45;color:var(--ink);background:var(--paper)}
+.chip.ok{background:var(--green)}.chip.bad{background:var(--yellow)}.chip.flag{background:var(--red);color:var(--white)}
+.chip .x{margin-left:2px;opacity:.7}
+.empty-note{font-size:0.75rem;color:var(--haze)}
+.modebar{display:flex;align-items:center;gap:8px;background:var(--yellow);color:var(--ink);padding:6px 10px;font-size:0.8125rem;margin-bottom:8px}
+.modebar button{margin-left:auto;background:var(--ink);color:var(--yellow);padding:2px 8px;font-size:0.75rem;min-height:28px}
+
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;padding:5px 2px;font-size:0.75rem;color:var(--muted);background:var(--night);--bc:var(--steel)}
+.tool[aria-pressed="true"]{background:var(--yellow);color:var(--ink);--bc:var(--ink)}
+.verdicts{display:flex;gap:9px}
+.verdicts .btn{flex:1;min-width:0;flex-direction:column;gap:2px;min-height:64px;padding:6px 4px;font-size:1rem}
+.verdicts .btn small{font-size:0.6875rem;font-family:var(--f-body)}
+
+/* sheet */
+.veil{position:absolute;inset:0;background:rgba(10,13,26,.78);display:flex;align-items:flex-end;z-index:20}
+.sheet{width:100%;max-height:88%;overflow-y:auto;background:var(--paper);color:var(--ink);padding:16px 16px 18px;border-top:calc(2*var(--u)) solid var(--ink)}
+.sheet h3{margin:0 0 6px;font-family:var(--f-head);font-weight:400;font-size:1.125rem;text-wrap:balance}
+.sheet p{margin:0 0 10px;font-size:0.9375rem}
+.sheet .btn.ghost{--bf:var(--paper-2);--bs:var(--pencil);color:var(--ink)}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;padding:10px;margin-bottom:8px;background:var(--white);--bc:var(--ink);font-size:0.9375rem}
+.opt .box{width:18px;height:18px;flex-shrink:0;margin-top:2px;border:var(--u) solid var(--ink);background:var(--white);display:flex;align-items:center;justify-content:center}
+.opt[aria-checked="true"]{background:var(--hl)}
+.opt[aria-checked="true"] .box{background:var(--ink)}
+.opt.round .box{border-radius:0}
+.sheet .section{font-size:0.75rem;color:var(--pencil);margin:12px 0 6px;letter-spacing:1px}
+.dot-line{display:flex;gap:10px;align-items:flex-start;background:var(--white);padding:10px;--bc:var(--ink);margin-bottom:12px}
+.result-card{background:var(--white);padding:12px;--bc:var(--ink);margin-bottom:12px;font-size:0.9375rem}
+
+/* result */
+.seal{min-width:92px;width:max-content;padding:0 12px;white-space:nowrap;text-align:center;line-height:1.2;height:92px;margin:6px auto 10px;display:flex;align-items:center;justify-content:center;font-family:var(--f-head);font-size:1.375rem;border:calc(2*var(--u)) solid currentColor;transform:rotate(-8deg);animation:stamp .25s steps(3) both}
+.seal.ok{color:var(--green)}.seal.retry{color:var(--yellow)}
+@keyframes stamp{from{transform:scale(1.6) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(-8deg);opacity:1}}
+.res-title{text-align:center;font-family:var(--f-head);font-size:1.375rem;margin:0}
+.res-sub{text-align:center;color:var(--muted);font-size:0.875rem;margin:4px 0 14px}
+.score-list{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:0.875rem;font-variant-numeric:tabular-nums}
+.score-list .total{border-top:2px dashed var(--steel);padding-top:6px;font-family:var(--f-head);color:var(--yellow)}
+.explain{background:var(--paper);color:var(--ink);padding:14px;--bc:var(--ink)}
+.explain h4{margin:0 0 6px;font-size:0.8125rem;color:var(--pencil);font-weight:400}
+.explain p{margin:0 0 10px;font-size:0.9375rem}
+.explain .tip{background:var(--hl);padding:8px 10px;margin:0}
+.risk-list{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.epi{display:flex;gap:10px;align-items:flex-start}
+.epi .say{flex:1;background:var(--panel);padding:10px 12px;--bc:var(--steel);font-size:0.875rem}
+
+/* report */
+.stars{display:flex;justify-content:center;gap:8px;margin:4px 0 10px}
+.metrics{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:0.9375rem;font-variant-numeric:tabular-nums}
+.metrics span:nth-child(even){color:var(--yellow);text-align:right}
+.gauge{display:grid;gap:4px;margin-top:6px}
+.gauge .bar{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.gauge .bar i{height:12px;background:var(--night)}
+.gauge .bar i.on{background:var(--teal)}
+.gauge.conv .bar i.on{background:var(--green)}
+.gauge .g-l{display:flex;justify-content:space-between;font-size:0.8125rem;color:var(--muted)}
+
+.toast{position:absolute;left:12px;right:12px;bottom:178px;z-index:30;background:var(--ink);color:var(--paper);padding:8px 12px;font-size:0.875rem;--bc:var(--paper);pointer-events:none;animation:pop .2s steps(2) both}
+@keyframes pop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.mock-tag{display:inline-block;background:var(--yellow);color:var(--ink);font-size:0.6875rem;padding:1px 6px}
+
+body.no-motion *,body.no-motion *::before{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.slogan{font-size:0.875rem;color:var(--muted);margin:2px 0 0;letter-spacing:1px}
+.stamps{display:flex;gap:8px}
+.stamps span{flex:1;text-align:center;padding:6px 2px;font-family:var(--f-head);font-size:0.875rem;border:var(--u) solid currentColor;transform:rotate(-4deg)}
+.stamps .s1{color:var(--green)}.stamps .s2{color:var(--red);transform:rotate(3deg)}.stamps .s3{color:var(--yellow)}
+@media (max-width:420px){.logo{font-size:2.8rem}.screen{padding:12px 10px 16px}}
+</style>
+
+<div class="stage">
+  <aside class="aside" aria-label="시제품 안내">
+    <h2>DIGITAL GUARD<br>도트 테마 시제품</h2>
+    <p>디지털 안전 센터의 심사관이 되어 메시지·파일·계정 요청을 대조하고 판정하는 게임의 HTML 시제품입니다. Unity로 만들기 전에 화면과 조작을 확인하는 용도예요.</p>
+    <div class="legend">
+      <span><span id="lg-mag"></span> 대조: 정보 두 개를 차례로 눌러 비교</span>
+      <span><span id="lg-flag"></span> 표시: 의심스러운 곳에 깃발</span>
+      <span><span id="lg-folder"></span> 조회: 센터 자료 꺼내 보기</span>
+      <span><span id="lg-book"></span> 규칙: 오늘의 규칙 다시 보기</span>
+    </div>
+    <p class="note">모든 이름·번호·주소는 가상이며 <span style="font-family:var(--f-mono)">.example</span> 예약 도메인만 씁니다. 링크와 파일은 실제로 열리지 않아요. 진행 기록은 이 브라우저에만 저장됩니다.<br>글꼴: 갈무리(Galmuri) © Lee Minseo, SIL OFL 1.1</p>
+  </aside>
+  <main class="device pxb" id="device" aria-live="polite"></main>
+</div>
+
+<script>
+'use strict';
+/* ================= pixel icons & sprites ================= */
+const ICONS = {
+  mag:["..XXX....",".X...X...","X.....X..","X.....X..","X.....X..",".X...X...","..XXXXX..","......XX.",".......XX"],
+  flag:[".XXXXXXX.",".XXXXXX..",".XXXXXXX.",".X.......",".X.......",".X.......",".X.......","XXX......"],
+  book:["XXXX.XXXX","X..X.X..X","X.XX.XX.X","X..X.X..X","X.XX.XX.X","X..X.X..X","XXXXXXXXX"],
+  folder:["XXX......","X..XXXXXX","X.......X","X.......X","X.......X","XXXXXXXXX"],
+  check:["........X",".......XX","X.....XX.","XX...XX..",".XX.XX...","..XXX....","...X....."],
+  cross:["XX.....XX",".XX...XX.","..XX.XX..","...XXX...","..XX.XX..",".XX...XX.","XX.....XX"],
+  q:[".XXXXX.","XX...XX",".....XX","...XXX.","...XX..",".......","...XX.."],
+  clip:["..XXX..",".X...X.",".X.X.X.",".X.X.X.",".X.X.X.",".X.X.X.",".X...X.","..XXX.."],
+  person:["..XXX..",".XXXXX.",".XXXXX.","..XXX..",".......","XXXXXXX","XXXXXXX"],
+  mail:["XXXXXXXXX","XX.....XX","X.X...X.X","X..X.X..X","X...X...X","XXXXXXXXX"],
+  bubble:[".XXXXXXX.","XXXXXXXXX","XX.X.X.XX","XXXXXXXXX",".XXXXXXX.","..XX.....",".X......."],
+  bell:["...X...","..XXX..",".XXXXX.",".XXXXX.",".XXXXX.","XXXXXXX","...X..."],
+  star:["....X....","....X....","...XXX...","XXXXXXXXX",".XXXXXXX.","..XXXXX..",".XXX.XXX.","XX.....XX"],
+  gear:["..X.X..",".XXXXX.","XXX.XXX","XX...XX","XXX.XXX",".XXXXX.","..X.X.."],
+  mega:["......XX","....XXXX","XXXXXXXX","XXXXXXXX","XXXXXXXX","....XXXX","..X...XX","..X....."],
+  phone:["XXXXX","X...X","X...X","X...X","X...X","XXXXX","XX.XX","XXXXX"],
+  alert:["XXXXXXXXX","X.......X","X..XXX..X","X..XXX..X","X.......X","XXXXXXXXX","....X....","...XXX..."],
+  pause:["XX.XX","XX.XX","XX.XX","XX.XX","XX.XX"],
+  home:["...X...","..XXX..",".XXXXX.","XXXXXXX",".X...X.",".X.X.X.",".X.X.X."]
+};
+function px(name,size,color){
+  const g=ICONS[name]; if(!g) return '';
+  const w=Math.max(...g.map(r=>r.length)), h=g.length; let rects='';
+  g.forEach((row,y)=>{let x=0;while(x<row.length){if(row[x]==='X'){let s=x;while(row[x]==='X')x++;rects+=`<rect x="${s}" y="${y}" width="${x-s}" height="1"/>`;}else x++;}});
+  const s=size||16;
+  return `<svg class="px" aria-hidden="true" width="${Math.round(s*w/Math.max(w,h))}" height="${Math.round(s*h/Math.max(w,h))}" viewBox="0 0 ${w} ${h}" fill="${color||'currentColor'}">${rects}</svg>`;
+}
+const BOT=[".....C......",".....W......","..WWWWWWWW..",".WWWWWWWWWW.",".WNNNNNNNNW.",".WNCNNNNCNW.",".WNCNNNNCNW.",".WNNNCCNNNW.",".WWWWWWWWWW.","..WWWWWWWW..","...WW..WW...","..LLL..LLL.."];
+function sprite(rows,pal,size){
+  const w=rows[0].length,h=rows.length;let r='';
+  rows.forEach((row,y)=>[...row].forEach((c,x)=>{if(pal[c])r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${pal[c]}"/>`;}));
+  return `<svg class="px" aria-hidden="true" width="${size}" height="${Math.round(size*h/w)}" viewBox="0 0 ${w} ${h}">${r}</svg>`;
+}
+const dot=(s)=>sprite(BOT,{C:'#45C7C1',W:'#FFFFFF',N:'#1F2A4A',L:'#7F9CC9'},s||40);
+const FACE=["..HHHH..",".HHHHHH.","HHSSSSHH","HSESSESH","HSSSSSSH",".SSMMSS.","..SSSS..",".BBBBBB."];
+const PEOPLE={
+  grandma:{name:'박영순',role:'은솔이의 할머니',pal:{H:'#D8D8E0',S:'#F2C9A0',E:'#22201F',M:'#C0605A',B:'#8A6BD1'}},
+  eunsol:{name:'하은솔',role:'누리중 2학년',pal:{H:'#3A2A22',S:'#F5D2AE',E:'#22201F',M:'#C0605A',B:'#45C7C1'}},
+  haneul:{name:'이하늘',role:'옆집 회사원',pal:{H:'#5A3A22',S:'#EBC199',E:'#22201F',M:'#A8584F',B:'#3A4E7A'}}
+};
+const face=(k,s)=>sprite(FACE,PEOPLE[k].pal,s||36);
+
+/* ================= case data (all names, numbers and domains are fictional) ================= */
+const TODAY={day:'05',rule:'메시지가 말하는 것과 내가 원래 아는 것을 비교해요',
+  detail:'문자·메일·파일은 스스로를 소개할 뿐이에요. 공식 목록과 내 기록(주문 내역, 저장된 연락처, 내가 요청한 파일)을 함께 보고 판단해요.',
+  good:'택배 문자의 링크가 공식 주소 kongkong.example과 같고, 내 기록에 주문이 있다',
+  bad:'"아들"이라는 메시지인데 저장된 번호와 다른 번호에서 왔다',
+  term:'도메인: 인터넷 주소의 "진짜 주인" 이름. 주소의 끝부분을 보면 알 수 있어요.'};
+const RULES={
+  'R-LINK-01':'링크와 보낸 곳은 공식 목록과 맞춰 봐요. 주소는 끝부분이 진짜 주인이에요.',
+  'R-REPORT-01':'사칭·피싱이면 거부하고 신고해요. 고쳐서 다시 하면 되는 일은 안내만 해요.',
+  'R-FILE-01':'공식 스토어가 아닌 곳에서 받은 실행 파일은 열지 않아요.',
+  'R-FILE-02':'파일의 진짜 종류는 이름의 맨 끝이에요. 안내받은 종류와 다르면 열지 않아요.',
+  'R-FILE-03':'압축 파일은 안에 든 파일 목록을 먼저 봐요.',
+  'R-LOGIN-01':'로그인 알림의 기기·시간·장소를 내 활동과 맞춰 봐요.',
+  'R-MFA-01':'내가 시도한 로그인일 때만 인증 요청에 "예"를 눌러요.',
+  'R-ID-01':'가족·선생님·운영자라고 하면 원래 알던 연락처나 공식 명부로 확인해요.',
+  'R-VERIFY-01':'정보가 부족하거나 신원이 확실하지 않으면 공식 경로로 확인해요.',
+  'R-PW-02':'비밀번호와 인증번호는 누구에게도 알려 주지 않아요.'
+};
+const CASES=[
+ {id:'C2-04',title:'택배 주소 확인 문자',who:'grandma',level:'중급',risk:'high',
+  ask:'택배 주소가 잘못돼서 보관 중이래요. 링크 눌러서 주소를 다시 써야 하나요?',
+  rules:['R-LINK-01','R-REPORT-01'],
+  docs:[
+   {id:'sms',icon:'bubble',title:'받은 문자',kind:'문자',fields:[
+     {id:'from',label:'보낸 번호',value:'000-0000-9911',mono:1,ck:'phone',cv:'000-0000-9911'},
+     {id:'body',label:'내용',value:'[콩콩택배] 주소지 불명으로 상품이 보관 중입니다.\n아래에서 주소를 다시 입력해 주세요.',ck:'parcel',cv:'있음'},
+     {id:'link',label:'링크',value:'http://kongkong-delivery.example/a1',mono:1,ck:'domain',cv:'kongkong-delivery.example'}]},
+   {id:'official',icon:'book',title:'공식 연락처',kind:'센터 자료',fields:[
+     {id:'domain',label:'콩콩택배 공식 주소',value:'kongkong.example',mono:1,ck:'domain',cv:'kongkong.example'},
+     {id:'phone',label:'콩콩택배 대표 번호',value:'000-0000-1500',mono:1,ck:'phone',cv:'000-0000-1500'}]},
+   {id:'record',icon:'person',title:'내 기록',kind:'박영순',record:1,fields:[
+     {id:'orders',label:'최근 7일 주문',value:'없음',ck:'parcel',cv:'없음'},
+     {id:'waiting',label:'기다리는 택배',value:'없음',ck:'parcel',cv:'없음'}]}],
+  stages:[{allowed:['approve','reject'],correct:'reject',reportable:true,
+   risk:[{f:'sms.link',req:1,label:'링크 주소'},{f:'sms.from',req:0,label:'보낸 번호'}],
+   key:[[['sms.link','official.domain']],[['sms.body','record.orders'],['sms.body','record.waiting']]],
+   hints:{approve:'할머니의 기록을 볼까요? 기다리던 택배가 있었나요? 그리고 링크 주소를 끝에서부터 읽어 보세요.'},
+   explain:'주소의 끝부분을 보면 이 링크의 주인은 kongkong-delivery.example이에요. 콩콩택배의 공식 주소는 kongkong.example이고요. 게다가 할머니는 요즘 주문한 물건이 없었어요.',
+   tip:'택배 문자는 링크를 누르지 말고, 평소 쓰던 쇼핑 앱이나 택배 회사 대표 번호로 확인해요.',
+   epi:{who:'grandma',ok:'알려 줘서 고마워요. 신고까지 했으니 이웃들도 조심하겠네요.',bad:'링크를 누르기 직전에 센터가 막아 줬어요. 다음엔 주소를 꼭 볼게요.'}}]},
+ {id:'C2-05',title:'추석 사진 압축 파일',who:'grandma',level:'중급',risk:'low',
+  ask:'아들이 압축 파일을 보냈어요. 모르는 파일은 열면 안 된다던데, 이건 괜찮을까요?',
+  rules:['R-FILE-03','R-ID-01'],
+  docs:[
+   {id:'msg',icon:'bubble',title:'받은 메시지',kind:'말풍선',fields:[
+     {id:'from',label:'보낸 사람',value:'아들  000-0000-4410',mono:1,ck:'phone',cv:'000-0000-4410'},
+     {id:'body',label:'내용',value:'어머니, 추석 때 찍은 사진 모아서 보내요.',ck:'promise',cv:'사진'},
+     {id:'attach',label:'첨부',value:'추석사진_모음.zip  (48MB)',mono:1,file:'file'}]},
+   {id:'file',icon:'clip',title:'파일 정보',kind:'파일 정보 보기',hidden:1,fields:[
+     {id:'name',label:'전체 파일 이름',value:'추석사진_모음.zip',mono:1},
+     {id:'ext',label:'마지막 확장자 · 종류',value:'.zip  압축 파일',mono:1,ck:'ftype',cv:'압축'},
+     {id:'list',label:'압축 안에 든 파일',value:'IMG_0901.jpg ~ IMG_0924.jpg  (사진 24개)\n송편빚기.mp4  (동영상 1개)',mono:1}]},
+   {id:'record',icon:'person',title:'내 기록',kind:'박영순',record:1,fields:[
+     {id:'contact',label:'저장된 연락처',value:'아들  000-0000-4410',mono:1,ck:'phone',cv:'000-0000-4410'},
+     {id:'talk',label:'최근 대화',value:'(어제) 아들: "내일 사진 정리해서 보내 드릴게요"',ck:'promise',cv:'사진'}]}],
+  stages:[{allowed:['approve','reject'],correct:'approve',
+   risk:[],key:[[['msg.from','record.contact']],[['msg.body','record.talk']]],
+   hints:{reject:'파일 정보에서 압축 안에 든 파일들의 끝 글자를 확인해 볼까요? 할머니의 최근 대화도 함께 보세요.'},
+   explain:'압축 파일이라고 다 위험한 건 아니에요. 안에 든 것이 사진 24장과 동영상 1개뿐이고, 어제 아드님이 보내 주겠다고 한 사진이에요. 보낸 번호도 저장된 번호와 같아요.',
+   tip:'압축 파일은 내용 목록부터 봐요. .exe나 .apk처럼 실행하는 파일이 섞여 있으면 열지 않아요. 현실에서는 파일 이름만으로 안전을 장담할 수 없으니, 모르는 사람이 보낸 파일은 더 조심해요.',
+   epi:{who:'grandma',ok:'손주들 사진이 정말 많네요. 덕분에 편하게 봤어요.',bad:'괜히 겁나서 손주들 사진을 못 봤어요. 아쉬워요.'}}]},
+ {id:'C2-06',title:'견적서인 줄 알았던 파일',who:'haneul',level:'중급',risk:'high',
+  ask:'거래처에서 견적서를 보냈다는데, 첨부 파일 열어도 될까요?',
+  rules:['R-FILE-02','R-FILE-01','R-REPORT-01'],
+  docs:[
+   {id:'mail',icon:'mail',title:'받은 메일',kind:'메일',fields:[
+     {id:'from',label:'보낸 사람',value:'바구니마켓 입점지원\npartner@bagooni.example',mono:1,ck:'domain',cv:'bagooni.example'},
+     {id:'body',label:'내용',value:'요청하신 견적서 PDF 파일을 보내 드립니다.',ck:'ftype',cv:'문서'},
+     {id:'attach',label:'첨부',value:'견적서_최종.pdf …  (2.1MB)',mono:1,file:'file'}]},
+   {id:'file',icon:'clip',title:'파일 정보',kind:'파일 정보 보기',hidden:1,fields:[
+     {id:'name',label:'전체 파일 이름',value:'견적서_최종.pdf        .exe',mono:1},
+     {id:'ext',label:'마지막 확장자 · 종류',value:'.exe  실행 파일 (프로그램)',mono:1,ck:'ftype',cv:'실행'}]},
+   {id:'official',icon:'book',title:'공식 연락처',kind:'센터 자료',fields:[
+     {id:'domain',label:'바구니마켓 공식 주소',value:'bagooni.example',mono:1,ck:'domain',cv:'bagooni.example'}]},
+   {id:'record',icon:'person',title:'내 기록',kind:'이하늘',record:1,fields:[
+     {id:'req',label:'보낸 요청',value:'(10/14) 바구니마켓에 견적서 요청'},
+     {id:'expect',label:'받기로 한 파일',value:'견적서 (PDF 문서)',ck:'ftype',cv:'문서'}]}],
+  stages:[{allowed:['approve','reject'],correct:'reject',reportable:true,
+   risk:[{f:'file.ext',req:1,label:'마지막 확장자 .exe'},{f:'mail.attach',req:1,label:'첨부 파일'}],
+   key:[[['file.ext','record.expect'],['file.ext','mail.body']]],
+   hints:{approve:'파일 정보에서 이름의 맨 끝 글자를 확인해 보세요. 하늘 님이 받기로 한 파일은 어떤 종류였나요?'},
+   explain:'파일의 진짜 종류는 이름의 맨 끝이 정해요. "견적서_최종.pdf        .exe"는 중간의 .pdf가 아니라 공백 뒤에 숨은 .exe 때문에 실행 파일이에요. 보낸 주소가 공식 주소와 같아도, 요청한 문서가 아니면 열지 않아요.',
+   tip:'파일을 열지 말고, 거래처의 원래 알던 전화번호로 "이 파일 보내신 것 맞나요?" 확인한 뒤 신고해요.',
+   epi:{who:'haneul',ok:'거래처에 전화해 보니 보낸 적이 없대요. 계정이 도용됐던 거예요!',bad:'열기 직전에 센터 점검에서 막혔어요. 이름 끝을 꼭 볼게요.'}}]},
+ {id:'C2-02',title:'처음 보는 기기의 로그인',who:'eunsol',level:'중급',risk:'medium',
+  ask:'새 기기에서 로그인한다는 알림이 왔어요. "예"를 눌러도 돼요?',
+  rules:['R-LOGIN-01','R-MFA-01'],
+  docs:[
+   {id:'alert',icon:'bell',title:'로그인 알림',kind:'누리배움터',fields:[
+     {id:'device',label:'기기',value:'태블릿  NURI-LIB-TAB-07',mono:1,ck:'device',cv:'NURI-LIB-TAB-07'},
+     {id:'place',label:'위치',value:'누리중학교 와이파이',ck:'place',cv:'학교'},
+     {id:'time',label:'시간',value:'10월 13일(월) 14:05',ck:'time',cv:'14:05'},
+     {id:'ask',label:'요청',value:'2단계 인증: 본인이 맞나요?  [예] [아니요]'}]},
+   {id:'sched',icon:'book',title:'시간표',kind:'10월 13일 월',fields:[
+     {id:'p5',label:'5교시  13:50~14:35',value:'도서관 활용 수업',ck:'time',cv:{range:['13:50','14:35']}},
+     {id:'room',label:'수업 장소',value:'학교 도서실',ck:'place',cv:'학교'}]},
+   {id:'devices',icon:'folder',title:'기기 기록',kind:'센터 자료',hidden:1,lookup:'누리중 등록 기기 목록',fields:[
+     {id:'list',label:'학교 도서실 공용 태블릿',value:'NURI-LIB-TAB-01 ~ NURI-LIB-TAB-10',mono:1,ck:'device',cv:['NURI-LIB-TAB-01','NURI-LIB-TAB-02','NURI-LIB-TAB-03','NURI-LIB-TAB-04','NURI-LIB-TAB-05','NURI-LIB-TAB-06','NURI-LIB-TAB-07','NURI-LIB-TAB-08','NURI-LIB-TAB-09','NURI-LIB-TAB-10']}]},
+   {id:'record',icon:'person',title:'내 기록',kind:'하은솔',record:1,fields:[
+     {id:'mine',label:'평소 쓰는 기기',value:'내 휴대폰  EUNSOL-PHONE',mono:1,ck:'device',cv:'EUNSOL-PHONE'}]}],
+  stages:[{allowed:['approve','reject'],correct:'approve',
+   risk:[],key:[[['alert.time','sched.p5']],[['alert.device','devices.list']]],
+   hints:{reject:'로그인 시간에 은솔이는 어디서 무엇을 하고 있었을까요? 시간표를 보고, [조회] 버튼으로 기기 기록도 꺼내 보세요.'},
+   explain:'처음 보는 기기라고 모두 위험한 건 아니에요. 로그인 시간은 5교시 도서관 수업 중이고, 기기는 학교 도서실 공용 태블릿으로 등록돼 있어요. 은솔이가 수업 시간에 직접 로그인한 거예요.',
+   tip:'다중 인증 요청은 내가 로그인할 때만 "예"를 눌러요. 공용 기기를 쓴 뒤에는 꼭 로그아웃해요.',
+   epi:{who:'eunsol',ok:'덕분에 수업 시간에 과제를 바로 열었어요!',bad:'로그인이 막혀서 선생님께 다시 도움을 받았어요.'}}]},
+ {id:'C3-03',title:'손녀라는 새 번호',who:'grandma',level:'고급',risk:'high',
+  ask:'모르는 번호로 손녀라고 하는 메시지가 왔어요. 은솔이가 맞을까요? 부탁이 있다는데…',
+  rules:['R-ID-01','R-VERIFY-01'],
+  docs:[
+   {id:'msg',icon:'bubble',title:'받은 메시지',kind:'말풍선',fields:[
+     {id:'from',label:'보낸 번호',value:'000-0000-7720  (저장되지 않은 번호)',mono:1,ck:'phone',cv:'000-0000-7720'},
+     {id:'body',label:'내용',value:'할머니 나 은솔이야. 폰 액정이 깨져서 친구 폰 빌렸어.\n이따가 부탁할 게 있어. 이 번호로 답장해 줘.'}]},
+   {id:'record',icon:'person',title:'내 기록',kind:'박영순',record:1,fields:[
+     {id:'contact',label:'저장된 연락처',value:'은솔(손녀)  000-0000-3301',mono:1,ck:'phone',cv:'000-0000-3301'},
+     {id:'talk',label:'최근 대화',value:'(그제) 은솔: "할머니 주말에 갈게요!"  저장된 번호에서'}]}],
+  stages:[{allowed:['approve','reject','verify'],correct:'verify',alt:{reject:0.7},
+   risk:[{f:'msg.from',req:1,label:'저장되지 않은 번호'},{f:'msg.body',req:0,label:'이 번호로 답장해 달라는 말'}],
+   key:[[['msg.from','record.contact']]],
+   reasons:[{t:'저장된 번호가 아닌 번호에서 왔다',ok:1},{t:'가족이라는 말만 있고 확인할 방법이 메시지 안에 없다',ok:1},{t:'메시지가 짧다',ok:0},{t:'은솔이는 원래 문자를 안 보낸다',ok:0}],
+   routes:[{t:'저장된 은솔이 번호로 직접 전화한다',ok:1},{t:'이 번호로 "진짜 은솔이 맞니?"라고 답장한다',ok:0,why:'상대가 사칭자라면 "맞다"고 답할 거예요. 메시지에 적힌 연락처로는 확인이 되지 않아요.'},{t:'부탁을 먼저 들어 보고 판단한다',ok:0,why:'부탁을 들으려면 이 번호와 대화를 이어 가야 해요. 확인이 먼저예요.'}],
+   verifyResult:'저장된 번호로 전화하자 은솔이가 받았어요.\n"할머니, 제 폰 멀쩡해요! 그거 저 아니에요."',
+   hints:{approve:'할머니의 저장된 연락처와 보낸 번호가 같나요?'},
+   altNote:'막은 건 좋아요. 그런데 진짜 은솔이가 곤란한 상황일 수도 있으니, 저장된 번호로 확인하면 확실해요.',
+   explain:'가족이라고 해도 처음 보는 번호라면 먼저 확인해요. 메시지에 적힌 번호로 묻지 말고, 원래 저장해 둔 번호로 직접 전화하면 바로 알 수 있어요.',
+   tip:'확인된 사칭 번호는 차단하고 신고해요. 가족끼리 확인 질문을 미리 정해 두는 것도 좋아요.',
+   epi:{who:'grandma',ok:'은솔이 목소리를 듣고 나니 마음이 놓여요. 주말에 같이 이 게임 해 보기로 했어요.',bad:'답장하기 전에 센터가 멈춰 줬어요. 다음엔 저장된 번호로 먼저 전화할게요.'}}]},
+ {id:'C4-02',title:'"선생님"의 긴급 부탁',who:'eunsol',level:'심화',risk:'high',
+  ask:'담임 선생님이라는 분이 급하게 출석부 편집 권한을 달래요. 바로 줘야 할까요?',
+  rules:['R-ID-01','R-VERIFY-01','R-PW-02','R-REPORT-01'],
+  docs:[
+   {id:'msg',icon:'bubble',title:'받은 메시지',kind:'말풍선',fields:[
+     {id:'from',label:'보낸 사람',value:'"2-3반 담임 김서연"\n등록되지 않은 번호 · 프로필 사진: 학교 로고'},
+     {id:'body',label:'내용',value:'은솔아, 선생님 휴대폰을 바꿔서 이 번호로 연락해.\n지금 회의 중이라 급해! 학급 출석부 파일 편집 권한을 아래 계정에 바로 줘. 10분 안에 해야 해.'},
+     {id:'acct',label:'요청 계정',value:'kim.teacher.class3@freemail.example',mono:1,ck:'teacher',cv:'kim.teacher.class3@freemail.example'}]},
+   {id:'perm',icon:'folder',title:'권한 변경 요청',kind:'구름서랍',fields:[
+     {id:'file',label:'파일',value:'2-3반_출석부.xlsx',mono:1},
+     {id:'who',label:'추가할 사람',value:'kim.teacher.class3@freemail.example',mono:1,ck:'teacher',cv:'kim.teacher.class3@freemail.example'},
+     {id:'level',label:'권한',value:'편집 가능'}]},
+   {id:'staff',icon:'book',title:'교직원 연락처',kind:'센터 자료',hidden:1,lookup:'누리중학교 교직원 공식 연락처',fields:[
+     {id:'kim',label:'2-3반 담임 김서연 선생님 · 공식 계정',value:'kim.sy@baeumteo.example',mono:1,ck:'teacher',cv:'kim.sy@baeumteo.example'},
+     {id:'office',label:'학교 교무실',value:'000-0000-2300',mono:1}]},
+   {id:'record',icon:'person',title:'내 기록',kind:'하은솔',record:1,fields:[
+     {id:'role',label:'내 역할',value:'학급 출석 도우미 (출석부 파일 관리자)'},
+     {id:'known',label:'선생님께 받은 지난 공지',value:'kim.sy@baeumteo.example 에서 받음',mono:1,ck:'teacher',cv:'kim.sy@baeumteo.example'}]}],
+  stages:[
+   {allowed:['approve','reject','verify'],correct:'verify',alt:{reject:0.7},
+    risk:[{f:'msg.acct',req:1,label:'공식 계정이 아닌 요청 계정'},{f:'msg.from',req:0,label:'등록되지 않은 번호'},{f:'msg.body',req:0,label:'"10분 안에"라는 재촉'}],
+    key:[[['msg.acct','staff.kim'],['msg.acct','record.known'],['perm.who','staff.kim'],['perm.who','record.known']]],
+    routes:[{t:'학교 교무실 공식 번호로 전화해 확인한다',ok:1},{t:'메시지를 보낸 번호로 "진짜 선생님 맞아요?"라고 답장한다',ok:0,why:'상대가 사칭자라면 "맞다"고 답할 거예요. 확인은 원래 알던 공식 경로로 해요.'},{t:'일단 권한을 주고 나중에 확인한다',ok:0,why:'권한을 먼저 주면 출석부가 이미 남의 손에 들어갈 수 있어요.'}],
+    verifyResult:'센터 → 누리중 교무실\n"김서연 선생님은 오늘 휴대폰을 바꾸지 않았고, 그런 메시지를 보낸 적이 없다고 하십니다."',
+    next:{docs:[
+      {id:'result',icon:'phone',title:'확인 결과',kind:'교무실 답변',fields:[
+        {id:'text',label:'교무실 답변',value:'김서연 선생님은 오늘 휴대폰을 바꾸지 않았고, 그런 메시지를 보낸 적이 없습니다. 출석부 권한은 학교 계정으로만 관리합니다.'}]},
+      {id:'msg2',icon:'bubble',title:'새 메시지',kind:'같은 번호',fields:[
+        {id:'body',label:'확인하는 사이 도착',value:'왜 아직 안 해? 그럼 방금 네 폰으로 간 인증번호 6자리라도 보내 줘.'}]}]},
+    hints:{approve:'요청 계정을 공식 연락처와 비교해 봤나요? [조회] 버튼에서 교직원 연락처를 꺼낼 수 있어요.'},
+    altNote:'공식 계정이 아니니 막은 건 잘했어요. 그래도 진짜 선생님이 곤란할 수 있으니, 공식 연락처로 확인하면 모두가 안심할 수 있어요.',
+    explain:'요청 계정이 학교 공식 계정과 달라요. 하지만 "휴대폰을 바꿨다"는 말이 사실일 수도 있어서, 막기 전에 공식 경로로 확인하는 것이 가장 좋아요.',
+    tip:'급하다는 메시지일수록 원래 알던 공식 연락처로 확인해요.',
+    epi:{who:'eunsol',ok:'',bad:'권한을 주기 직전에 센터가 멈춰 줬어요. 다음엔 꼭 확인할게요.'}},
+   {allowed:['approve','reject'],correct:'reject',reportable:true,
+    risk:[{f:'result.text',req:1,label:'교무실의 확인 결과'},{f:'msg2.body',req:1,label:'인증번호 요구'}],
+    key:[],
+    hints:{approve:'확인 결과를 다시 읽어 볼까요? 그리고 인증번호는 누구에게 알려 줘도 될까요?'},
+    explain:'공식 연락처로 확인해 보니 선생님이 보낸 메시지가 아니었어요. 게다가 인증번호까지 달라고 했죠. 인증번호는 "지금 로그인하는 사람이 나"라는 열쇠라서 선생님, 친구, 운영자 누구에게도 알려 주지 않아요.',
+    tip:'이상한 메시지는 캡처해 두고 보호자나 선생님께 알린 뒤 신고해요.',
+    epi:{who:'eunsol',ok:'선생님이 확인해 줘서 고맙다고 하셨어요. 반 친구들에게도 알려 주신대요.',bad:'인증번호를 보내기 전에 센터가 막아 줬어요. 휴, 다행이에요.'}}]}
+];
+const VERDICT={approve:{t:'승인',ic:'check',cls:'green',sub:'정상 요청'},reject:{t:'거부',ic:'cross',cls:'red',sub:'위험 요청'},verify:{t:'추가 확인',ic:'q',cls:'yellow',sub:'확인이 필요'}};
+const NICK_A=['반짝이는','차분한','꼼꼼한','용감한','다정한','부지런한','침착한','씩씩한'];
+const NICK_B=['부엉이','고양이','두더지','수달','다람쥐','펭귄','고래','여우'];
+
+/* ================= state ================= */
+const KEY='digital-guard-pixel-v1';
+const defaults=()=>({nick:pickNick(),settings:{scale:1,plain:false,still:false},view:'title',ci:0,results:[],streak:0,c:null});
+function pickNick(){return NICK_A[Math.floor(Math.random()*NICK_A.length)]+' '+NICK_B[Math.floor(Math.random()*NICK_B.length)]+' '+String(Math.floor(Math.random()*90)+10);}
+let S=defaults(), UI={tab:null,mode:null,pick:null,sheet:null,toast:null,choice:null};
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&typeof d.ci==='number'&&Array.isArray(d.results))S=Object.assign(defaults(),d);}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const kase=()=>CASES[S.ci];
+const stage=()=>kase().stages[S.c.si];
+function docList(){const k=kase();const extra=S.c.extraDocs||[];return k.docs.concat(extra).filter(d=>!d.hidden||S.c.revealed.includes(d.id));}
+function allDocs(){return kase().docs.concat(S.c.extraDocs||[]);}
+function fieldBy(fid){const [d,f]=fid.split('.');const doc=allDocs().find(x=>x.id===d);return doc&&doc.fields.find(x=>x.id===f);}
+function toMin(t){const [h,m]=t.split(':').map(Number);return h*60+m;}
+function same(a,b){
+  if(a&&a.range)return typeof b==='string'&&toMin(b)>=toMin(a.range[0])&&toMin(b)<=toMin(a.range[1]);
+  if(b&&b.range)return same(b,a);
+  if(Array.isArray(b))return b.includes(a); if(Array.isArray(a))return a.includes(b);
+  return a===b;
+}
+function newCaseState(){return {si:0,attempts:0,routeTries:0,flags:[],clues:[],revealed:[],extraDocs:[],stageLog:[],seen:[],firstVerdict:null};}
+function toast(msg){UI.toast=msg;renderToast();clearTimeout(toast.t);toast.t=setTimeout(()=>{UI.toast=null;renderToast();},2600);}
+function renderToast(){const old=$('.toast');if(old)old.remove();if(UI.toast){const d=document.createElement('div');d.className='toast pxb';d.setAttribute('role','status');d.textContent=UI.toast;$('#device').appendChild(d);}}
+function applySettings(){document.documentElement.style.setProperty('--scale',S.settings.scale);document.body.classList.toggle('plain-font',!!S.settings.plain);document.body.classList.toggle('no-motion',!!S.settings.still);}
+
+/* ================= render ================= */
+function render(){
+  applySettings();
+  const dev=$('#device');
+  let top='',cond='',body='',dock='';
+  const v=S.view;
+  if(v!=='title'){
+    const k=kase();
+    top=`<header class="topbar"><div class="lamps" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="where"><b>DAY ${TODAY.day}</b>${v==='report'?'근무 결과':v==='brief'?'아침 브리핑':`사건 ${S.ci+1}/${CASES.length} · ${esc(k.level)}`}</div>
+      <button class="icon-btn" data-act="settings" aria-label="설정">${px('gear',16)}</button>
+      <button class="icon-btn" data-act="home" aria-label="처음 화면">${px('home',16)}</button></header>`;
+    if(v==='desk'||v==='result')cond=`<button class="condition" data-act="rules" aria-label="오늘의 조건 보기"><b>${px('star',12)} 오늘의 조건</b><span>${esc(TODAY.rule)}</span>▸</button>`;
+  }
+  if(v==='title')body=viewTitle();
+  else if(v==='brief')body=viewBrief();
+  else if(v==='desk'){body=viewDesk();dock=viewDock();}
+  else if(v==='result')body=viewResult();
+  else if(v==='report')body=viewReport();
+  dev.innerHTML=`${top}${cond}<div class="screen ${UI.mode?'mode-on':''}" id="screen">${body}</div>${dock?`<div class="dock">${dock}</div>`:''}${UI.sheet?renderSheet():''}`;
+  renderToast();
+}
+function viewTitle(){
+  const resume=S.ci>0||S.c;
+  return `<section class="title">
+    <div><p class="logo">DIGITAL<br><span>GUARD</span></p><p class="subtitle">디지털 보안 심사관</p><p class="slogan">의심하고, 확인하고, 판단하라.</p></div>
+    <div class="hero-scene pxb">${dot(52)}<div class="bubble pxb">누리 디지털 안전 센터에 온 걸 환영해요! 오늘은 이웃들의 문자와 파일을 함께 살펴봐요.</div></div>
+    <div class="stamps" aria-label="판정은 세 가지"><span class="s1">승인</span><span class="s2">거부</span><span class="s3">추가 확인</span></div>
+    <div class="card pxb"><h3>심사관 이름</h3><div class="nick"><b>${esc(S.nick)}</b><button class="icon-btn" data-act="nick">다시 뽑기</button></div><p class="small" style="margin:6px 0 0">이름은 미리 만든 조합에서만 골라요. 실명이나 나이는 묻지 않아요.</p></div>
+    <div class="stack">
+      <button class="btn full" data-act="start">${resume?'처음부터 출근하기':'출근하기'} ▶</button>
+      ${resume?`<button class="btn ghost full" data-act="resume">이어서 하기 (사건 ${Math.min(S.ci+1,CASES.length)}/${CASES.length})</button>`:''}
+    </div>
+    <p class="footnote"><span class="mock-tag">HTML 시제품</span> Unity 구현 전 화면·조작 확인용 · 모든 이름·주소는 가상</p>
+  </section>`;
+}
+function viewBrief(){
+  return `<div class="stack">
+    <div class="brief-day">DAY<b>${TODAY.day}</b>체험판 · 사건 ${CASES.length}건</div>
+    <div class="news">${dot(40)}<div class="card pxb" style="flex:1"><h3>오늘의 소식</h3><p class="small" style="margin:0;color:var(--white)">누리시에 "택배 주소가 잘못됐다"는 가짜 문자와 가족인 척하는 메시지가 돌고 있대요.</p></div></div>
+    <div class="rulecard pxb"><span class="tag">오늘의 조건</span><h3>${esc(TODAY.rule)}</h3>
+      <div class="example"><span class="ok">${px('check',12)} 좋은 예</span><span>${esc(TODAY.good)}</span><span class="no">${px('cross',12)} 주의</span><span>${esc(TODAY.bad)}</span></div>
+      <p class="term">${esc(TODAY.term)}</p></div>
+    <p class="small" style="margin:0">이 카드는 검토 데스크 맨 위에 붙여 둘게요. 언제든 눌러서 다시 볼 수 있어요.</p>
+    <button class="btn full" data-act="begin">업무 시작 ▶</button>
+  </div>`;
+}
+function markFor(fid){
+  const m=[];
+  S.c.clues.forEach(c=>{if(c.a===fid||c.b===fid)m.push(c.ok?'ok':'bad');});
+  const u=[...new Set(m)];
+  return u.map(x=>`<span class="mk ${x}">${x==='ok'?'일치':'불일치'}</span>`).join('')+(S.c.flags.includes(fid)?`<span class="mk flag">${px('flag',10)} 의심</span>`:'');
+}
+function viewDesk(){
+  const k=kase(), docs=docList();
+  if(!UI.tab||!docs.find(d=>d.id===UI.tab))UI.tab=docs[0].id;
+  const doc=docs.find(d=>d.id===UI.tab);
+  const tabs=docs.map(d=>`<button class="tab pxb" role="tab" aria-selected="${d.id===UI.tab}" data-act="tab" data-id="${d.id}">${px(d.icon,13)} ${esc(d.title)}${(d.hidden||d.fresh)&&!S.c.seen.includes(d.id)?'<i class="new" aria-label="새 자료"></i>':''}</button>`).join('');
+  const fields=doc.fields.map(f=>{const fid=doc.id+'.'+f.id;
+    const cls=['field',UI.pick===fid?'sel':'',S.c.flags.includes(fid)?'flagged':''].join(' ');
+    return `<button class="${cls}" data-act="field" data-id="${fid}"><span class="lbl">${esc(f.label)}<span class="marks">${markFor(fid)}</span></span><span class="val ${f.mono?'mono':''}">${esc(f.value)}</span>${f.file&&!UI.mode?`<span class="open-file">${px('clip',10)} 파일 정보 보기 ▸</span>`:''}</button>`;}).join('');
+  const clues=S.c.clues.map((c,i)=>`<span class="chip ${c.ok?'ok':'bad'}">${c.ok?'일치':'불일치'} · ${esc(fieldBy(c.a).label)} ↔ ${esc(fieldBy(c.b).label)}<button class="x" data-act="unclue" data-i="${i}" aria-label="단서 지우기">✕</button></span>`).join('')
+    +S.c.flags.map(f=>`<span class="chip flag">${px('flag',10)} ${esc(fieldBy(f).label)}</span>`).join('');
+  const modebar=UI.mode==='compare'?`<div class="modebar">${px('mag',14)} ${UI.pick?'두 번째 정보를 눌러요 (다른 탭도 돼요)':'비교할 첫 번째 정보를 눌러요'}<button data-act="mode" data-m="compare">끝내기</button></div>`
+    :UI.mode==='flag'?`<div class="modebar">${px('flag',14)} 의심스러운 정보를 눌러 깃발을 꽂거나 빼요<button data-act="mode" data-m="flag">끝내기</button></div>`:'';
+  return `<div class="request pxb"><span class="avatar">${face(k.who,36)}</span><div><div class="who">${esc(PEOPLE[k.who].name)} · ${esc(PEOPLE[k.who].role)}</div><p>"${esc(k.ask)}"</p></div></div>
+    ${S.c.si>0?`<div class="modebar" style="background:var(--teal)">${px('phone',14)} 확인 결과가 도착했어요. 새 자료를 보고 다시 판정해요.</div>`:''}
+    ${modebar}
+    <div class="tabs" role="tablist" aria-label="자료">${tabs}</div>
+    <article class="doc pxb" aria-label="${esc(doc.title)}"><div class="doc-head">${px(doc.icon,14)} ${esc(doc.title)}<span class="kind">${esc(doc.kind)}</span></div><div class="fields">${fields}</div></article>
+    <section class="tray"><h4>근거 트레이</h4>${clues?`<div class="chips">${clues}</div>`:'<p class="empty-note">대조로 만든 단서와 깃발이 여기에 모여요.</p>'}</section>`;
+}
+function viewDock(){
+  const st=stage();
+  const hasLookup=allDocs().some(d=>d.lookup&&!S.c.revealed.includes(d.id));
+  const tools=`<div class="tools">
+    <button class="tool pxb" data-act="mode" data-m="compare" aria-pressed="${UI.mode==='compare'}">${px('mag',16)}대조</button>
+    <button class="tool pxb" data-act="mode" data-m="flag" aria-pressed="${UI.mode==='flag'}">${px('flag',16)}표시</button>
+    <button class="tool pxb" data-act="lookup" ${hasLookup?'':'aria-disabled="true"'}>${px('folder',16)}조회</button>
+    <button class="tool pxb" data-act="rules">${px('book',16)}규칙</button></div>`;
+  const vs=['approve','reject','verify'].filter(v=>st.allowed.includes(v)).map(v=>`<button class="btn ${VERDICT[v].cls}" data-act="verdict" data-v="${v}">${px(VERDICT[v].ic,16)}<span>${VERDICT[v].t}</span></button>`).join('');
+  return tools+`<div class="verdicts">${vs}</div>`;
+}
+
+/* ================= sheets ================= */
+function renderSheet(){
+  const s=UI.sheet, st=S.c?stage():null; let h='';
+  if(s.type==='rules'){
+    h=`<h3>${px('star',14)} 오늘의 조건</h3><p>${esc(TODAY.rule)}</p><p class="small" style="color:var(--pencil)">${esc(TODAY.detail)}</p>
+      ${S.c?`<div class="section">이 사건에 적용되는 규칙</div>${kase().rules.map(r=>`<div class="dot-line pxb"><b style="white-space:nowrap">${r}</b><span>${esc(RULES[r])}</span></div>`).join('')}`:''}
+      <button class="btn full" data-act="close">닫기</button>`;
+  } else if(s.type==='lookup'){
+    const L=allDocs().filter(d=>d.lookup&&!S.c.revealed.includes(d.id));
+    h=`<h3>${px('folder',14)} 자료 조회</h3><p>센터가 이미 가진 자료를 꺼내 봐요. 조회는 몇 번을 해도 괜찮아요.</p>
+      ${L.length?L.map(d=>`<button class="opt pxb" data-act="reveal" data-id="${d.id}">${px(d.icon,16)}<span>${esc(d.lookup)}</span></button>`).join(''):'<p class="small" style="color:var(--pencil)">이 사건에서 더 꺼낼 자료가 없어요.</p>'}
+      <button class="btn ghost full" data-act="close">닫기</button>`;
+  } else if(s.type==='confirm'){
+    const v=s.v;
+    const reasons=st.reasons&&v!=='approve'?st.reasons:null;
+    const routes=v==='verify'&&st.routes?st.routes:null;
+    h=`<h3>"${VERDICT[v].t}"(으)로 판정할까요?</h3><p class="small" style="color:var(--pencil)">깃발 ${S.c.flags.length}개 · 단서 ${S.c.clues.length}개</p>
+      ${reasons?`<div class="section">근거를 모두 골라요</div>${s.order.map(i=>{const r=reasons[i];const on=s.rs.includes(i);return `<button class="opt pxb" role="checkbox" aria-checked="${on}" data-act="reason" data-i="${i}"><span class="box">${on?px('check',10,'#F2EBD9'):''}</span><span>${esc(r.t)}</span></button>`;}).join('')}`:''}
+      ${routes?`<div class="section">누구에게, 어떤 경로로 확인할까요?</div>${s.rorder.map(i=>{const r=routes[i];const on=s.route===i;return `<button class="opt round pxb" role="radio" aria-checked="${on}" data-act="route" data-i="${i}"><span class="box">${on?px('check',10,'#F2EBD9'):''}</span><span>${esc(r.t)}</span></button>`;}).join('')}`:''}
+      <div class="row" style="margin-top:10px"><button class="btn ghost" data-act="close">다시 볼래요</button><button class="btn ${VERDICT[v].cls}" data-act="submit" ${routes&&s.route==null?'disabled aria-disabled="true"':''}>${VERDICT[v].t} 확정</button></div>`;
+  } else if(s.type==='hint'){
+    h=`<div class="dot-line pxb">${dot(36)}<div><b>한 번 더 살펴볼까요?</b><p style="margin:4px 0 0">${esc(s.text)}</p></div></div>
+      <div class="row"><button class="btn ghost" data-act="giveup">정답 보기</button><button class="btn" data-act="retry">다시 생각하기</button></div>`;
+  } else if(s.type==='reroute'){
+    const routes=st.routes;
+    h=`<h3>확인 경로를 다시 골라 볼까요?</h3><p>${esc(s.why)}</p>
+      ${routes.map((r,i)=>i===s.bad?'':`<button class="opt round pxb" role="radio" aria-checked="${s.route===i}" data-act="route2" data-i="${i}"><span class="box">${s.route===i?px('check',10,'#F2EBD9'):''}</span><span>${esc(r.t)}</span></button>`).join('')}
+      <button class="btn yellow full" data-act="submit-route" ${s.route==null?'disabled aria-disabled="true"':''}>이 경로로 확인</button>`;
+  } else if(s.type==='verifyResult'){
+    h=`<h3>${px('phone',14)} 확인 결과</h3>${s.note?`<p class="small" style="color:var(--pencil)">${esc(s.note)}</p>`:''}<div class="result-card pxb" style="white-space:pre-line">${esc(st.verifyResult)}</div>
+      <button class="btn full" data-act="after-verify">${st.next?'새 자료 보고 다시 판정하기':'결과 보기'} ▶</button>`;
+  } else if(s.type==='report'){
+    h=`<h3>${px('mega',14)} 신고도 할까요?</h3><p>사칭이나 피싱이면 신고해서 다른 사람도 지킬 수 있어요. 고쳐서 다시 하면 되는 일이면 안내만 해요.</p>
+      <div class="row"><button class="btn ghost" data-act="report" data-r="0">안내만 하기</button><button class="btn red" data-act="report" data-r="1">${px('mega',14)} 신고하기</button></div>`;
+  } else if(s.type==='settings'){
+    const sc=[1,1.15,1.3,1.5,1.75];
+    h=`<h3>${px('gear',14)} 설정</h3><div class="section">글자 크기</div><div class="row">${sc.map(x=>`<button class="opt pxb" style="justify-content:center" role="radio" aria-checked="${S.settings.scale===x}" data-act="scale" data-x="${x}">${Math.round(x*100)}%</button>`).join('')}</div>
+      <div class="section">문서 본문 글꼴</div><div class="row"><button class="opt pxb" role="radio" aria-checked="${!S.settings.plain}" data-act="font" data-x="0">도트 글꼴</button><button class="opt pxb" role="radio" aria-checked="${!!S.settings.plain}" data-act="font" data-x="1">일반 글꼴</button></div>
+      <div class="section">움직임</div><button class="opt pxb" role="checkbox" aria-checked="${!!S.settings.still}" data-act="still"><span class="box">${S.settings.still?px('check',10,'#F2EBD9'):''}</span><span>움직임 줄이기</span></button>
+      <div class="section">진행</div>${s.confirmReset?`<p>지금까지의 기록이 지워져요. 정말 처음부터 할까요?</p><div class="row"><button class="btn ghost" data-act="close">그만두기</button><button class="btn red" data-act="reset">처음부터</button></div>`:`<button class="btn ghost full" data-act="ask-reset">진행 초기화</button>`}
+      <button class="btn full" style="margin-top:12px" data-act="close">닫기</button>`;
+  }
+  return `<div class="veil" data-act="veil"><div class="sheet" role="dialog" aria-modal="true">${h}</div></div>`;
+}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+/* ================= game logic ================= */
+function tapField(fid){
+  const f=fieldBy(fid);
+  if(UI.mode==='flag'){const i=S.c.flags.indexOf(fid);if(i>=0)S.c.flags.splice(i,1);else S.c.flags.push(fid);save();render();return;}
+  if(UI.mode==='compare'){
+    if(!UI.pick){UI.pick=fid;render();return;}
+    if(UI.pick===fid){UI.pick=null;render();return;}
+    const a=fieldBy(UI.pick),b=f;
+    if(!a.ck||!b.ck||a.ck!==b.ck){toast('이 두 정보는 서로 비교하기 어려워요. 같은 종류끼리 골라 봐요.');UI.pick=null;render();return;}
+    const pair=[UI.pick,fid].sort();
+    if(!S.c.clues.some(c=>[c.a,c.b].sort().join()===pair.join())){const ok=same(a.cv,b.cv);S.c.clues.push({a:UI.pick,b:fid,ok});toast(ok?'일치: 두 정보가 같아요':'불일치: 두 정보가 달라요');}
+    else toast('이미 비교한 정보예요.');
+    UI.pick=null;save();render();return;
+  }
+  if(f.file){S.c.revealed.includes(f.file)||S.c.revealed.push(f.file);UI.tab=f.file;markSeen(f.file);save();render();return;}
+}
+function markSeen(id){if(!S.c.seen.includes(id))S.c.seen.push(id);}
+function openConfirm(v){UI.mode=null;UI.pick=null;const st=stage();UI.sheet={type:'confirm',v,rs:[],route:null,order:st.reasons?shuffle(st.reasons.map((_,i)=>i)):[],rorder:st.routes?shuffle(st.routes.map((_,i)=>i)):[]};render();}
+function submit(){
+  const s=UI.sheet, st=stage(), v=s.v; S.c.attempts++;
+  if(S.c.attempts===1&&S.c.firstVerdict==null)S.c.firstVerdict=v;
+  S.c.lastReasons=s.rs.slice(); S.c.lastRoute=s.route;
+  let outcome=v===st.correct?'correct':(st.alt&&st.alt[v]?'alt':'wrong');
+  if(outcome==='wrong'){
+    if(S.c.attempts===1){const text=(st.hints&&st.hints[v])||(v==='verify'?'필요한 정보가 이미 자료 안에 있어요. 다시 비교해 볼까요?':'자료를 하나씩 다시 비교해 볼까요?');UI.sheet={type:'hint',text};save();render();return;}
+    finishStage('wrong',v);return;
+  }
+  S.c.outcome=outcome; S.c.verdict=v;
+  if(outcome==='correct'&&v==='verify'){
+    const r=st.routes[s.route];
+    if(!r.ok){S.c.routeTries=1;UI.sheet={type:'reroute',bad:s.route,why:r.why,route:null};render();return;}
+    S.c.routeFirst=true;UI.sheet={type:'verifyResult'};render();return;
+  }
+  if((v==='reject')&&outcome==='correct'&&st.reportable!==undefined){UI.sheet={type:'report'};render();return;}
+  finishStage(outcome,v);
+}
+function finishStage(outcome,v){
+  const st=stage(), c=S.c;
+  const first=c.attempts===1;
+  let vp=0; if(outcome==='correct')vp=first?100:60; else if(outcome==='alt')vp=Math.round((first?100:60)*st.alt[v]);
+  const flags=c.flags; let rp=0,reqFound=0;
+  st.risk.forEach(r=>{if(flags.includes(r.f)){rp+=r.req?20:10;if(r.req)reqFound++;}});
+  const wrongFlags=flags.filter(f=>!st.risk.some(r=>r.f===f)).length; rp=Math.max(0,rp-5*wrongFlags);
+  const has=(a,b)=>c.clues.some(x=>(x.a===a&&x.b===b)||(x.a===b&&x.b===a));
+  const keyOK=st.key.length>0&&st.key.every(g=>g.some(([a,b])=>has(a,b)));
+  const kp=keyOK?20:0;
+  let reasonPts=0; if(st.reasons&&outcome!=='wrong'&&v!=='approve'){const rs=c.lastReasons||[];const okSel=rs.filter(i=>st.reasons[i].ok).length, bad=rs.filter(i=>!st.reasons[i].ok).length, okAll=st.reasons.filter(r=>r.ok).length;reasonPts=bad?0:(okSel===okAll?30:okSel>0?15:0);}
+  const routePts=(outcome==='correct'&&v==='verify'&&c.routeFirst)?30:0;
+  const reportPts=(c.report!=null&&st.reportable!==undefined&&(c.report===!!st.reportable))?10:0;
+  let streakPts=0; if(outcome==='correct'&&first){S.streak++;streakPts=Math.min(40,10*(S.streak-1));} else if(outcome==='wrong'){S.streak=0;}
+  const total=vp+rp+kp+reasonPts+routePts+reportPts+streakPts;
+  c.stageLog.push({si:c.si,outcome,first,verdict:v,firstVerdict:c.firstVerdict,correct:st.correct,vp,rp,kp,reasonPts,routePts,reportPts,streakPts,total,reqFound,reqTotal:st.risk.filter(r=>r.req).length,keyOK,report:c.report,reportable:st.reportable,risk:kase().risk});
+  // move on: 2-stage case continues only after a correct verify
+  if(outcome==='correct'&&v==='verify'&&st.next){enterNext();return;}
+  endCase();
+}
+function enterNext(){
+  const st=stage(), c=S.c;
+  c.extraDocs=(c.extraDocs||[]).concat(st.next.docs.map(d=>Object.assign({fresh:1},d)));
+  c.si++; c.attempts=0; c.routeTries=0; c.routeFirst=false; c.flags=[]; c.report=null; c.firstVerdict=null; c.lastReasons=[]; c.lastRoute=null;
+  UI.sheet=null; UI.tab=st.next.docs[0].id; markSeen(UI.tab); save(); render();
+}
+function endCase(){
+  const c=S.c; S.results.push({id:kase().id,log:c.stageLog});
+  S.view='result'; UI.sheet=null; UI.mode=null; UI.pick=null; save(); render();
+  const sc=$('#screen'); if(sc)sc.scrollTop=0;
+}
+function viewResult(){
+  const k=kase(), c=S.c, log=c.stageLog, last=log[log.length-1], st=k.stages[last.si];
+  const good=last.outcome!=='wrong';
+  const ok=last.outcome==='correct';
+  const seal=ok?`<div class="seal ok">${VERDICT[last.verdict].t}</div>`:last.outcome==='alt'?`<div class="seal retry">${VERDICT[last.verdict].t}</div>`:`<div class="seal retry">정답<br>${VERDICT[last.correct].t}</div>`;
+  const title=ok?'정확한 판단이에요!':last.outcome==='alt'?'안전한 선택이에요':'함께 알아봐요';
+  const sub=ok?(last.first?'첫 판단에 맞혔어요':'다시 생각해서 맞혔어요'):last.outcome==='alt'?`정답은 "${VERDICT[last.correct].t}"였어요`:`정답은 "${VERDICT[last.correct].t}"예요. 복습 노트에 남겨 둘게요`;
+  const rows=[];log.forEach((g,i)=>{const pre=log.length>1?`${i+1}단계 `:'';rows.push([pre+'판정',g.vp]);if(g.rp)rows.push([pre+'위험 탐지',g.rp]);if(g.kp)rows.push([pre+'근거 확인',g.kp]);if(g.reasonPts)rows.push([pre+'근거 선택',g.reasonPts]);if(g.routePts)rows.push([pre+'확인 경로',g.routePts]);if(g.reportPts)rows.push([pre+'신고 판단',g.reportPts]);if(g.streakPts)rows.push([pre+'연속 정답',g.streakPts]);});
+  const total=log.reduce((a,g)=>a+g.total,0);
+  const risks=st.risk.map(r=>`<span class="chip ${c.flags.includes(r.f)?'ok':'flag'}">${c.flags.includes(r.f)?'찾음':'못 찾음'} · ${esc(r.label)}</span>`).join('');
+  let reportLine='';
+  if(last.report!=null&&last.reportable!==undefined){reportLine=last.report===!!last.reportable?'<p>신고 판단까지 정확했어요.</p>':`<p>${last.reportable?'사칭·피싱은 신고하면 다른 사람도 지킬 수 있어요.':'이 경우는 신고보다 다시 하도록 안내하는 게 맞아요.'}</p>`;}
+  const reasonLine=st.reasons&&last.verdict!=='approve'?`<h4>올바른 근거</h4><div class="risk-list">${st.reasons.filter(r=>r.ok).map(r=>`<span class="chip ok">${px('check',10)} ${esc(r.t)}</span>`).join('')}</div>`:'';
+  const epiText=good?st.epi.ok:st.epi.bad;
+  return `${seal}<h2 class="res-title">${title}</h2><p class="res-sub">${esc(sub)}</p>
+    <div class="card pxb" style="margin-bottom:16px"><div class="score-list">${rows.map(r=>`<span>${r[0]}</span><span>+${r[1]}</span>`).join('')}<span class="total">합계</span><span class="total">${total}점</span></div></div>
+    <div class="explain pxb">${last.outcome==='alt'&&st.altNote?`<p><b>${esc(st.altNote)}</b></p>`:''}
+      ${st.risk.length?`<h4>위험 요소</h4><div class="risk-list">${risks}</div>`:`<h4>위험 요소</h4><p>없어요. 정상 요청이에요.</p>`}
+      ${reasonLine}<h4>해설</h4><p>${esc(st.explain)}</p>${reportLine}<p class="tip">${px('bubble',12)} 이렇게 해요: ${esc(st.tip)}</p></div>
+    ${epiText?`<div class="epi" style="margin-top:16px"><span class="avatar">${face(st.epi.who,36)}</span><div class="say pxb">${esc(epiText)}</div></div>`:''}
+    <button class="btn full" style="margin-top:18px" data-act="next">${S.ci+1<CASES.length?'다음 사건':'근무 결과 보기'} ▶</button>`;
+}
+function viewReport(){
+  const logs=S.results.flatMap(r=>r.log);
+  const n=logs.length||1, acc=Math.round(logs.filter(g=>g.outcome==='correct'&&g.first).length/n*100);
+  const reqT=logs.reduce((a,g)=>a+g.reqTotal,0), reqF=logs.reduce((a,g)=>a+g.reqFound,0), det=reqT?Math.round(reqF/reqT*100):100;
+  const over=logs.filter(g=>g.firstVerdict==='reject'&&g.correct!=='reject').length;
+  const riskApp=logs.filter(g=>g.firstVerdict==='approve'&&g.correct!=='approve');
+  const highApp=riskApp.some(g=>g.risk==='high');
+  const reps=logs.filter(g=>g.reportable!==undefined&&g.report!=null), repOK=reps.filter(g=>g.report===!!g.reportable).length;
+  const w={low:10,medium:20,high:30};
+  const safety=Math.max(0,100-riskApp.reduce((a,g)=>a+w[g.risk||'medium'],0)), conv=Math.max(0,100-over*15);
+  const stars=1+(acc>=70?1:0)+(acc>=90&&det>=80&&!highApp?1:0);
+  const total=logs.reduce((a,g)=>a+g.total,0);
+  const bar=(v)=>Array.from({length:10},(_,i)=>`<i class="${i<Math.round(v/10)?'on':''}"></i>`).join('');
+  const word=v=>v>=80?'튼튼해요':v>=50?'보통이에요':'조금 아쉬워요';
+  return `<div class="stack"><div style="text-align:center"><div class="brief-day">DAY ${TODAY.day} 근무 완료</div></div>
+    <div class="stars" aria-label="별 ${stars}개">${[1,2,3].map(i=>px('star',34,i<=stars?'#F7D84A':'#3A4E7A')).join('')}</div>
+    <div class="card pxb"><div class="metrics">
+      <span>판정 정확도</span><span>${acc}%</span><span>위험 탐지율</span><span>${det}% (${reqF}/${reqT})</span>
+      <span>과잉 차단</span><span>${over}건</span><span>위험 승인</span><span>${riskApp.length}건</span>
+      <span>신고 판단</span><span>${reps.length?`${repOK}/${reps.length}`:'—'}</span><span>오늘 점수</span><span>${total}점</span></div></div>
+    <div class="card pxb"><div class="gauge"><div class="g-l"><span>안전 게이지</span><span>${word(safety)} ${safety}</span></div><div class="bar">${bar(safety)}</div></div>
+      <div class="gauge conv" style="margin-top:10px"><div class="g-l"><span>편의 게이지</span><span>${word(conv)} ${conv}</span></div><div class="bar">${bar(conv)}</div></div></div>
+    <div class="epi">${dot(40)}<div class="say pxb">${over===0&&riskApp.length===0?'막아야 할 것과 열어 줘야 할 것을 잘 구분했어요!':over>0?'정상 요청도 몇 건 막았어요. 낯설다고 다 위험한 건 아니에요.':'놓친 위험이 있었어요. 해설을 다시 보면 금방 익숙해져요.'}</div></div>
+    <button class="btn full" data-act="again">처음부터 다시 하기</button>
+    <p class="footnote">체험판에는 사건 ${CASES.length}건이 들어 있어요. 전체 게임은 Day 0~18, 약 110건으로 설계되어 있어요.</p></div>`;
+}
+
+/* ================= events ================= */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]'); if(!el)return;
+  const a=el.dataset.act;
+  if(a==='veil'){if(e.target===el&&UI.sheet&&['rules','lookup','settings','confirm'].includes(UI.sheet.type)){UI.sheet=null;render();}return;}
+  if(el.disabled||el.getAttribute('aria-disabled')==='true'){if(a==='lookup')toast('이 사건에서 더 꺼낼 자료가 없어요.');return;}
+  switch(a){
+    case 'nick':S.nick=pickNick();save();render();break;
+    case 'start':Object.assign(S,{view:'brief',ci:0,results:[],streak:0,c:null});save();render();break;
+    case 'resume':if(S.results.length>=CASES.length){S.view='report';}else{S.view=S.c?(S.c.stageLog.length&&S.results.length>S.ci?'result':'desk'):'brief';}render();break;
+    case 'begin':S.view='desk';S.ci=0;S.c=newCaseState();UI.tab=null;save();render();break;
+    case 'home':S.view='title';UI.sheet=null;UI.mode=null;save();render();break;
+    case 'settings':UI.sheet={type:'settings'};render();break;
+    case 'rules':UI.sheet={type:'rules'};render();break;
+    case 'lookup':UI.sheet={type:'lookup'};render();break;
+    case 'close':UI.sheet=null;render();break;
+    case 'tab':UI.tab=el.dataset.id;markSeen(UI.tab);save();render();break;
+    case 'mode':{const m=el.dataset.m;UI.mode=UI.mode===m?null:m;UI.pick=null;render();break;}
+    case 'field':tapField(el.dataset.id);break;
+    case 'unclue':e.stopPropagation();S.c.clues.splice(+el.dataset.i,1);save();render();break;
+    case 'reveal':{const id=el.dataset.id;S.c.revealed.push(id);UI.tab=id;markSeen(id);UI.sheet=null;save();render();toast('자료를 꺼냈어요.');break;}
+    case 'verdict':openConfirm(el.dataset.v);break;
+    case 'reason':{const i=+el.dataset.i,rs=UI.sheet.rs,k=rs.indexOf(i);k>=0?rs.splice(k,1):rs.push(i);render();break;}
+    case 'route':UI.sheet.route=+el.dataset.i;render();break;
+    case 'submit':submit();break;
+    case 'retry':UI.sheet=null;render();toast('자료와 깃발은 그대로 있어요. 천천히 다시 봐요.');break;
+    case 'giveup':S.c.attempts=Math.max(S.c.attempts,2);finishStage('wrong',S.c.firstVerdict||'approve');break;
+    case 'route2':UI.sheet.route=+el.dataset.i;render();break;
+    case 'submit-route':{const st=stage(),r=st.routes[UI.sheet.route];if(r.ok){UI.sheet={type:'verifyResult'};}else{const right=st.routes.find(x=>x.ok);UI.sheet={type:'verifyResult',note:`올바른 경로는 "${right.t}"예요. 이 경로로 확인했어요.`};}render();break;}
+    case 'after-verify':finishStage('correct','verify');break;
+    case 'report':S.c.report=el.dataset.r==='1';UI.sheet=null;finishStage(S.c.outcome,S.c.verdict);break;
+    case 'next':if(S.ci+1<CASES.length){S.ci++;S.c=newCaseState();S.view='desk';UI.tab=null;}else{S.view='report';}save();render();{const sc=$('#screen');if(sc)sc.scrollTop=0;}break;
+    case 'again':Object.assign(S,{view:'brief',ci:0,results:[],streak:0,c:null});save();render();break;
+    case 'scale':S.settings.scale=+el.dataset.x;save();render();break;
+    case 'font':S.settings.plain=el.dataset.x==='1';save();render();break;
+    case 'still':S.settings.still=!S.settings.still;save();render();break;
+    case 'ask-reset':UI.sheet.confirmReset=true;render();break;
+    case 'reset':S=defaults();try{localStorage.removeItem(KEY);}catch(err){}UI={tab:null,mode:null,pick:null,sheet:null,toast:null};save();render();break;
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.sheet&&['rules','lookup','settings','confirm'].includes(UI.sheet.type)){UI.sheet=null;render();}});
+
+function start(data){
+  if(data&&data.S)S=data.S; else load();
+  if(S.view==='desk'&&!S.c)S.view='brief';
+  ['mag','flag','folder','book'].forEach(n=>{const el=document.getElementById('lg-'+n);if(el)el.innerHTML=px(n,16,'#45C7C1');});
+  render();
+}
+if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(()=>({S}));
+(window.claude&&window.claude.hot&&window.claude.hot.ready)?window.claude.hot.ready(start):start(window.claude&&window.claude.hot&&window.claude.hot.data||{});
+</script>
