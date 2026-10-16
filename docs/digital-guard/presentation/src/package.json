@@ -1,0 +1,7 @@
+{
+  "name": "data-please-deck",
+  "private": true,
+  "description": "Builds the Data, Please. mid-term presentation (pptxgenjs) and its pixel-art assets",
+  "scripts": { "deck": "node build_deck.js ../DataPlease_중간설계발표.pptx", "art": "node pixelart.js" },
+  "dependencies": { "pptxgenjs": "4.0.1", "sharp": "0.35.5" }
+}
