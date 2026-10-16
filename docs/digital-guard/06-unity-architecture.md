@@ -105,9 +105,10 @@ Assets/
 | `DocumentAdded` | CaseManager | DocumentView(트레이) | 문서 ID |
 | `ClueCreated` / `FlagToggled` | CaseManager | DocumentView, 근거 트레이 | Clue / 필드 ID |
 | `VerdictSubmitted` | DecisionPanel | CaseManager | 판정, 근거 ID 목록, 시도 번호 |
-| `VerdictEvaluated` | CaseManager | ScoreManager, FeedbackView, AudioManager | VerdictResult |
+| `VerdictEvaluated` | CaseManager | ScoreManager(결과 누적, 화면 비공개), ProcessedStampView, AudioManager | VerdictResult |
 | `CaseCompleted` | CaseManager | ScoreManager, ProgressManager, SaveManager | CaseRecord |
-| `DayCompleted` | GameManager | ProgressManager, SaveManager, ReportView | DaySummary |
+| `DayCompleted` | GameManager | ProgressManager, SaveManager, DayResultView | DaySummary (완료/실패, 사건별 정답·해설) |
+| `SecurityIncident` | CaseManager | GameManager | 사고 난 사건 ID (즉시 DayResult 실패로 전환) |
 | `ThemeChanged` | ThemeManager | 모든 View | ThemeDefinition |
 | `SettingsChanged` | SaveManager | AudioManager, ThemeManager, View | Settings |
 
@@ -147,12 +148,12 @@ Assets/
 | Lobby | 오늘의 근무 시작 | Briefing (새 규칙 있음) / CaseReview (없음) |
 | Lobby | 이어서 하기 | CaseReview (저장된 사례부터) |
 | Briefing | 브리핑 완료 | CaseReview |
-| CaseReview | 판정 제출 | Feedback |
-| Feedback | 다시 생각하기 | CaseReview (같은 사례, 상태 유지) |
-| Feedback | 다음 사례 | CaseReview (다음 사례) |
-| Feedback | 다음 단계(2단계 사례) | CaseReview (같은 사례 다음 단계) |
-| Feedback | 마지막 사례 완료 | DaySummary |
-| DaySummary | 로비로 / 다시 하기 | Lobby / Briefing |
+| CaseReview | 판정 제출 | Processed (처리 완료 도장, 정답 비공개) |
+| Processed | 보안 사고(위험도 높음 사건 승인) | DayResult (실패) |
+| Processed | 다음 요청 | CaseReview (다음 사례) |
+| CaseReview | 추가 확인 제출(2단계 사례) | CaseReview (같은 사례 다음 단계, 고른 경로에 맞는 답 문서 추가) |
+| Processed | 마지막 사례 완료 | DayResult (처리 성공률 60% 이상이면 완료, 미만이면 실패) |
+| DayResult | 완료: 로비로·다음 Day / 실패: 처음부터 다시 하기 | Lobby / Briefing(같은 Day, Day 시작 저장으로 복원) |
 | 모든 진행 상태 | 일시정지 | Paused (이전 상태 기억) |
 | Paused | 계속하기 | 이전 상태 |
 
@@ -203,7 +204,7 @@ Assets/
 
 | 구분 | 내용 |
 |---|---|
-| 책임 | 사례·단계별로 허용된 판정 버튼만 표시, 판정 확인 시트·근거 선택 시트·확인 경로 시트 표시, 판정 제출 이벤트 발행, **중복 입력 방지** |
+| 책임 | 사례·단계별로 허용된 판정 버튼만 표시, 승인은 즉시 제출, 거부·추가 확인은 처리 시트(신고·근거·확인 경로) 표시(v0.3: 판정 확인 단계 없음), 판정 제출 이벤트 발행, **중복 입력 방지** |
 | 주요 필드 | `allowedVerdicts: VerdictType[]`, `requireReasons: bool`, `reasonOptions: List<ReasonOptionVM>`, `verifyRoutes: List<VerifyRouteVM>`, `state: Idle / Confirming / Submitting / Locked`, `attemptIndex: int` |
 | 주요 메서드 | `Configure(stageVM)`, `OnVerdictTapped(type)`, `Confirm()`, `Cancel()`, `Lock()`, `Unlock()` |
 | 중복 방지 | `Submitting` 상태에서는 모든 입력 무시. 제출 이벤트에 `attemptIndex`를 담아 CaseManager가 같은 시도 번호를 두 번 처리하지 않도록 이중 방어. 확인 시트를 끈 설정에서는 판정 버튼에 0.4초 입력 쿨다운 적용 |
@@ -324,7 +325,8 @@ ContentDatabase
 | `keyEvidence` | {fieldA, fieldB}[] | ✔ | 근거 확인 판정용 핵심 대조 쌍 | 판정 근거 |
 | `rationaleKey` | string | ✔ | 판정 근거 한두 문장 | 판정 근거 |
 | `explanationKey` | string | ✔ | 교육용 해설 (실천 팁 포함) | 교육용 해설 |
-| `hints` | {forVerdict, textKey}[] | ✔ | 오답 판정 종류별 힌트 | 오답 시 힌트 |
+| `hints` | {forVerdict, textKey}[] | ✔ | 오답 판정 종류별 '다시 볼 곳' 문장 (v0.3: 근무 결과에서만 표시) | 오답 시 힌트 |
+| `altNextDocs` | DocumentRef[] | | 추가 확인 경로를 틀렸을 때 도착하는 답 문서 (2단계 사례, [G20](01-overview.md#34-v03-판정-흐름-변경)) | — |
 | `reasonOptions` | {id, textKey, isCorrect, linkedFieldIds[]}[] | 고급 이상 ✔ | 근거 선택 보기 | — |
 | `verifyRoutes` | {id, textKey, isCorrect}[] | Verify 허용 시 ✔ | 확인 경로 보기 | — |
 | `epilogues` | {condition, textKey}[] | | 결과별 후일담 (Correct / OverBlock / RiskApprove) | — |
