@@ -37,6 +37,7 @@
 | 14 | 테스트 시나리오와 완료 기준 | [09-roadmap-and-tests.md](09-roadmap-and-tests.md#14-테스트-시나리오와-완료-기준) |
 | 15 | **모드·난이도·화면 흐름 (v0.4 회의 반영)** | [11-modes-and-ui.md](11-modes-and-ui.md) |
 | 부록 | 보안 규칙 목록 · 용어 사전 · 가상 데이터 작성 원칙 · 게임 이름 후보 · 확장자 도감 | [10-appendix.md](10-appendix.md) |
+| 합본 | 기획서 전체(15장 + 부록 + 플레이 가이드 + 인계 노트)를 한 파일로 — Word · PDF (A4, 105쪽, 목차·쪽 번호) | [combined/DataPlease_기획서_합본.docx](combined/DataPlease_기획서_합본.docx) · [PDF](combined/DataPlease_기획서_합본.pdf) |
 | 인계 노트 | 다른 폴더·세션에서 이어 작업하기 위한 요약(원칙·결정 기록·파일 지도·만드는 법·남은 일) | [HANDOFF.md](HANDOFF.md) |
 | 플레이 가이드 | 게임 밖 설명: 조작 · 규칙 · 점수 · 모드 · 난이도 · 이름과 기록 (인게임에는 넣지 않음) | [play-guide.md](play-guide.md) |
 | 시제품 | 도트 스타일 HTML 시제품 v0.4 (메인·일반/경쟁 모드·난이도 4단계·창구형 인게임·랭킹·어둡게/밝게) | [prototype/digital-guard-pixel.html](prototype/digital-guard-pixel.html) · [만드는 법](prototype/README.md) |

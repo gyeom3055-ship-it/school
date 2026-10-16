@@ -73,6 +73,10 @@ docs/digital-guard/
 ├─ 11-modes-and-ui.md         15장 v0.4 모드·난이도·화면 흐름 (앞 장과 다르면 이 장이 우선)
 ├─ play-guide.md              게임 밖 설명(조작·규칙·점수·모드·난이도·이름과 기록)
 ├─ HANDOFF.md                 이 파일
+├─ combined/
+│  ├─ DataPlease_기획서_합본.docx  기획서 전체 합본(Word, A4 105쪽, 목차·쪽 번호)
+│  ├─ DataPlease_기획서_합본.pdf   같은 내용 PDF
+│  └─ src/                         합본 만드는 스크립트(pandoc + 후처리)
 ├─ prototype/
 │  ├─ digital-guard-pixel.html  완성본(글꼴 포함, 브라우저로 바로 열기)
 │  ├─ src/game.html             원본(화면·사건 데이터·로직)
@@ -112,6 +116,18 @@ npm install playwright   # Chromium 필요
 node capture.js "$PWD/shots4" "/절대경로/docs/digital-guard/prototype/digital-guard-pixel.html"
 # 메인·난이도·인게임·일시정지·결과·경쟁·랭킹·밝게 모드 화면을 찍고, 콘솔에 errors: [] 이면 정상
 ```
+
+**기획서 합본 (Word · PDF)** — md 파일을 고친 뒤 다시 만들 때
+```bash
+cd docs/digital-guard/combined/src
+python3 build.py                                   # → book_fixed.docx (pandoc, lxml 필요)
+soffice --headless --convert-to pdf book_fixed.docx # → book_fixed.pdf (LibreOffice)
+python3 pages.py && python3 build.py               # 목차 쪽수 다시 계산 후 한 번 더
+soffice --headless --convert-to pdf book_fixed.docx
+# 결과를 ../DataPlease_기획서_합본.docx / .pdf 로 복사
+```
+- 합치는 순서: 개요(README) → 1~14장 → 15장 → 부록 → 플레이 가이드 → 인계 노트. 문서 사이 링크는 글자만 남긴다.
+- Word에서 열면 목차 업데이트를 물어본다. "예"를 누르면 Word 기준 쪽수로 다시 맞춰진다.
 
 **발표 자료**
 ```bash
