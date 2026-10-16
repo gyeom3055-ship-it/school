@@ -26,3 +26,7 @@
 
 - 게임 화면은 모두 **예상 UI/목업**이며, Unity 구현물이 아니다. 화면 목업은 HTML 시제품(`../prototype/`)과 같은 v0.3 흐름을 따른다.
 - 게임 이름은 **Data, Please.**로 확정했다(v0.4). `DIGITAL_GUARD_기획발표.pptx`는 이전 가칭으로 만든 v0.3 자료다.
+
+## 다시 만들기
+
+`src/`에 슬라이드 소스(`build_deck.js`), 그림 생성(`pixelart.js`), 시제품 캡처(`capture.js`)가 있다. 방법은 [HANDOFF.md 5장](../HANDOFF.md#5-만드는-법).
