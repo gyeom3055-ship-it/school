@@ -1,7 +1,7 @@
 <title>DIGITAL GUARD 도트 시제품</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: a portrait handheld "security terminal" centered on the page; a side manual appears on wide screens. Two moods: dark (night shift, default) and light (day shift), chosen in settings. */
+/* Layout: a portrait handheld "security terminal" centered on the page. No tutorial or helper copy inside the game (v0.4). Two moods: dark (night shift, default) and light (day shift), chosen in settings. */
 @font-face{font-family:"GalmuriBody";src:url(data:font/woff2;base64,__FONT_BODY__) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"GalmuriBody";src:url(data:font/woff2;base64,__FONT_BOLD__) format("woff2");font-weight:700;font-display:swap}
 @font-face{font-family:"GalmuriHead";src:url(data:font/woff2;base64,__FONT_HEAD__) format("woff2");font-weight:400;font-display:swap}
@@ -41,13 +41,6 @@ svg.px{display:inline-block;vertical-align:-0.15em;shape-rendering:crispEdges;fl
 
 .stage{height:100%;display:flex;justify-content:center;gap:36px;padding-block:14px;background-image:radial-gradient(var(--night-2) 2px,transparent 2px);background-size:12px 12px}
 .device{position:relative;width:100%;max-width:430px;height:100%;display:flex;flex-direction:column;background:var(--night-2);--bc:var(--steel);min-height:0;margin-inline:var(--u)}
-.aside{display:none;width:300px;align-self:center;color:var(--muted);font-size:0.875rem}
-.aside h2{font-family:var(--f-head);color:var(--white);font-size:1.25rem;font-weight:400;margin:0 0 10px;text-wrap:balance}
-.aside p{margin:0 0 12px}
-.aside .legend{display:grid;gap:8px;margin:14px 0}
-.aside .legend span{display:flex;gap:10px;align-items:center}
-.aside .note{border-top:2px dashed var(--steel);padding-top:12px;font-size:0.8125rem}
-@media (min-width:900px){.aside{display:block}}
 
 /* top bar */
 .topbar{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--panel);border-bottom:var(--u) solid var(--steel)}
@@ -261,17 +254,6 @@ body.no-motion *,body.no-motion *::before{animation:none!important;transition:no
 </style>
 
 <div class="stage">
-  <aside class="aside" aria-label="시제품 안내">
-    <h2>DIGITAL GUARD<br>도트 테마 시제품 v0.4</h2>
-    <p>디지털 안전 센터의 심사관 한 명이 되어 창구로 들어오는 메시지·파일·계정 요청을 대조하고 판정하는 게임의 HTML 시제품입니다. 일반 모드와 경쟁 모드, 난이도 4단계, 어둡게·밝게 분위기를 확인할 수 있어요.</p>
-    <div class="legend">
-      <span><span id="lg-mag"></span> 대조: 정보 두 개를 차례로 눌러 비교</span>
-      <span><span id="lg-flag"></span> 표시: 의심스러운 곳에 깃발</span>
-      <span><span id="lg-folder"></span> 조회: 센터 자료 꺼내 보기</span>
-      <span><span id="lg-book"></span> 규칙: 오늘의 규칙 다시 보기</span>
-    </div>
-    <p class="note">모든 이름·번호·주소는 가상이며 <span style="font-family:var(--f-mono)">.example</span> 예약 도메인만 씁니다. 링크와 파일은 실제로 열리지 않아요. 진행 기록은 이 브라우저에만 저장됩니다.<br>글꼴: 갈무리(Galmuri) © Lee Minseo, SIL OFL 1.1</p>
-  </aside>
   <main class="device pxb" id="device" aria-live="polite"></main>
 </div>
 
@@ -511,15 +493,11 @@ const NICK_B=['부엉이','고양이','두더지','수달','다람쥐','펭귄',
    Same screen and controls at every level; only the cases change. */
 const MODES={normal:{t:'일반 모드',d:'시간 제한 없이 차근차근'},versus:{t:'경쟁 모드',d:'사건마다 제한 시간 · 점수로 랭킹'}};
 const DIFFS=[
-  {name:'쉬움',desc:'문자·메시지 한 통. 서류 두세 장만 맞춰 보면 풀려요.',cases:['C2-04','C2-05'],time:60},
-  {name:'보통',desc:'메일과 첨부파일이 들어와요. 확장자와 조회 자료까지 봐요.',cases:['C2-04','C2-05','C2-06','C2-02'],time:50},
-  {name:'어려움',desc:'가족 사칭이 섞여요. 추가 확인과 확인 경로까지 골라요.',cases:['C2-05','C2-06','C2-02','C3-03'],time:45},
-  {name:'전문가',desc:'2단계 사건과 재촉하는 메시지. 모든 도구를 써야 해요.',cases:['C2-04','C2-05','C2-06','C2-02','C3-03','C4-02'],time:40}];
+  {name:'쉬움',desc:'문자 · 메시지',cases:['C2-04','C2-05'],time:60},
+  {name:'보통',desc:'메일 · 첨부파일 · 로그인',cases:['C2-04','C2-05','C2-06','C2-02'],time:50},
+  {name:'어려움',desc:'가족 · 지인 사칭',cases:['C2-05','C2-06','C2-02','C3-03'],time:45},
+  {name:'전문가',desc:'2단계 사건 · 재촉하는 메시지',cases:['C2-04','C2-05','C2-06','C2-02','C3-03','C4-02'],time:40}];
 const RULE_BY_DIFF=['링크와 보낸 사람을 내 기록·공식 자료와 비교해요','파일의 진짜 종류는 이름의 맨 끝을 봐요','가족·지인이라고 하면 원래 알던 연락처로 확인해요','급하다는 요청일수록 공식 경로로 확인해요'];
-// fictional sample rows so the ranking screen is not empty in the prototype (marked 예시 on screen)
-const DEMO_RANKS=[[{nick:'꼼꼼한 수달 21',score:640,acc:100},{nick:'차분한 펭귄 57',score:410,acc:50}],
-  [{nick:'용감한 여우 33',score:1180,acc:100},{nick:'다정한 고래 12',score:760,acc:75}],
-  [{nick:'침착한 부엉이 48',score:1240,acc:100}],[{nick:'부지런한 다람쥐 90',score:1890,acc:83}]];
 
 /* ================= officer & visitor sprites ================= */
 const OFFICER=["........KKKKKKKK........","......KKCCCCCCCCKK......",".....KCCCCCYYCCCCCK.....","....KCCCCCYYYYCCCCCK....","....KCCCCCCYYCCCCCCK....","....KccccccccccccccK....","...KKKKKKKKKKKKKKKKKK...","....KHHSSSSSSSSSSHHK....","....KHSSSSSSSSSSSSHK....","....KSSEESSSSSSEESSK....","....KSSEESSSSSSEESSK....","...KsSSSSSSSSSSSSSSsK...","....KSSSSSMMMMSSSSSK....",".....KSSSSSSSSSSSSK.....","......KKSSSSSSSSKK......","........KKSSSSKK........","....KKKKTTWWWWTTKKKK....","..KKUUUUUTTWWTTUUUUUKK..",".KUUUUUUUUTWWTUUUUUUUUK.",".KUUUYYUUUUWWUUUUUUUUUK.","KUUUYYYYUUUWWUUUUUUUUUUK","KUUUUYYUUUUWWUUUUUUUUUUK","KUUUUUUUUUUWWUUUUUUUUUUK","KUUUUUUUUUUUUUUUUUUUUUUK"];
@@ -605,7 +583,7 @@ function render(){
   let top='',cond='',body='',dock='';
   const v=S.view;
   if(['brief','desk','end'].includes(v)){
-    const label=v==='end'?'근무 결과':v==='brief'?'브리핑':'심사 중';
+    const label=v==='end'?'근무 결과':v==='brief'?'브리핑':'근무 중';
     top=`<header class="topbar">
       <button class="hud-btn pxb" data-act="pause" aria-label="일시정지 · 설정">${px('pause',14)}</button>${soundBtn()}
       <div class="where"><b>${esc(D().name)}</b>${MODES[S.mode].t} · ${label}</div>
@@ -625,22 +603,21 @@ function viewTitle(){
   const resume=S.resumeView&&S.c&&S.mode==='normal'&&['brief','desk','end'].includes(S.resumeView);
   return `<section class="title">
     <div class="mainbar">${soundBtn()}<button class="hud-btn pxb" data-act="settings" aria-label="설정">${px('gear',16)}<span>설정</span></button></div>
-    <div><p class="logo">DIGITAL<br><span>GUARD</span></p><p class="subtitle">디지털 보안 심사관</p><p class="slogan">의심하고, 확인하고, 판단하라.</p></div>
-    <div class="hero-scene pxb"><span class="officer">${officer(76)}</span><div class="bubble pxb">어서 와요, 심사관님! 오늘도 수상한 요청을 가려내 볼까요?<span class="by">${dot(26)} 도트</span></div></div>
+    <div><p class="logo">DIGITAL<br><span>GUARD</span></p><p class="slogan">의심하고, 확인하고, 판단하라.</p></div>
+    <div class="hero-scene pxb"><span class="officer">${officer(76)}</span><div class="bubble pxb">어서 와요! 오늘도 수상한 요청을 가려내 볼까요?<span class="by">${dot(26)} 도트</span></div></div>
     <div class="stack">
       ${resume?`<button class="btn yellow full" data-act="resume">이어서 하기 · ${esc(D().name)}</button>`:''}
-      <button class="btn full mode-btn" data-act="pick-mode" data-m="normal">${px('book',18)}<span>일반 모드<small>${MODES.normal.d}</small></span></button>
-      <button class="btn yellow full mode-btn" data-act="pick-mode" data-m="versus">${px('clock',18)}<span>경쟁 모드<small>${MODES.versus.d}</small></span></button>
+      <button class="btn full mode-btn" data-act="pick-mode" data-m="normal">${px('book',18)}<span>일반 모드</span></button>
+      <button class="btn yellow full mode-btn" data-act="pick-mode" data-m="versus">${px('clock',18)}<span>경쟁 모드</span></button>
       <button class="btn ghost full" data-act="rank">${px('trophy',16)} 랭킹</button>
     </div>
-    <div class="card pxb"><h3>심사관 이름</h3><div class="nick"><b>${esc(S.nick)}</b><button class="icon-btn" data-act="nick">다시 뽑기</button></div><p class="small" style="margin:6px 0 0">랭킹에 이 이름이 올라가요. 실명이나 나이는 묻지 않아요.</p></div>
-    <p class="footnote"><span class="mock-tag">HTML 시제품</span> Unity 구현 전 화면·조작 확인용 · 세로 화면 고정 · 모든 이름·주소는 가상</p>
+    <div class="card pxb"><h3>플레이어 이름</h3><div class="nick"><b>${esc(S.nick)}</b><button class="icon-btn" data-act="nick">다시 뽑기</button></div></div>
   </section>`;
 }
 function viewDiff(){
   const items=DIFFS.map((d,i)=>{
     const open=unlocked(i), best=(S.ranks[i]||[]).filter(r=>!r.demo)[0];
-    const badge=!open?`<span class="lock">${px('lock',12)} ${DIFFS[i-1].name} 통과 시 열림</span>`:S.cleared[i]?`<span class="lock ok">${px('star',12)} 통과</span>`:'';
+    const badge=!open?`<span class="lock">${px('lock',12)} 잠김</span>`:S.cleared[i]?`<span class="lock ok">${px('star',12)} 통과</span>`:'';
     return `<button class="diff pxb lv${i} ${open?'':'locked'}" data-act="pick-diff" data-d="${i}" ${open?'':'aria-disabled="true"'}>
       <span class="diff-n">${esc(d.name)}</span><span class="diff-d">${esc(d.desc)}</span>
       <span class="diff-m">${'■'.repeat(i+1)}${'□'.repeat(3-i)} · 사건 ${d.cases.length}건${S.mode==='versus'?` · 사건당 ${d.time}초`:''}${S.mode==='versus'&&best?` · 내 최고 ${best.score}점`:''}</span>${badge}</button>`;}).join('');
@@ -648,29 +625,25 @@ function viewDiff(){
     <div class="navrow"><button class="hud-btn pxb" data-act="back" aria-label="처음 화면으로">${px('back',14)}<span>처음으로</span></button><span class="mode-tag ${S.mode}">${MODES[S.mode].t}</span></div>
     <h2 class="scr-h">난이도 선택</h2>
     ${items}
-    <p class="footnote">화면과 조작은 모든 난이도가 같아요. 들어오는 사건만 어려워져요.</p></div>`;
+    </div>`;
 }
 function viewRank(){
-  const t=UI.rankTab, mine=(S.ranks[t]||[]), demo=DEMO_RANKS[t].map(r=>Object.assign({demo:1,date:'예시'},r));
-  const rows=mine.concat(demo).sort((a,b)=>b.score-a.score).slice(0,10);
+  const t=UI.rankTab, rows=(S.ranks[t]||[]).slice().sort((a,b)=>b.score-a.score).slice(0,10);
   const tabs=DIFFS.map((d,i)=>`<button class="tab pxb" role="tab" aria-selected="${i===t}" data-act="rank-tab" data-d="${i}">${esc(d.name)}</button>`).join('');
-  const list=rows.length?rows.map((r,i)=>`<li class="rk pxb ${r.last?'me':''}"><span class="rk-n">${i+1}</span><span class="rk-who">${esc(r.nick)}${r.demo?' <span class="mock-tag">예시</span>':''}<small>정확도 ${r.acc}% · ${esc(r.date)}</small></span><b>${r.score}</b></li>`).join(''):'<p class="empty-note">아직 기록이 없어요.</p>';
+  const list=rows.length?rows.map((r,i)=>`<li class="rk pxb ${r.last?'me':''}"><span class="rk-n">${i+1}</span><span class="rk-who">${esc(r.nick)}<small>정확도 ${r.acc}% · ${esc(r.date)}</small></span><b>${r.score}</b></li>`).join(''):'<p class="empty-note">기록 없음</p>';
   return `<div class="stack">
     <div class="navrow"><button class="hud-btn pxb" data-act="back" aria-label="처음 화면으로">${px('back',14)}<span>처음으로</span></button><span class="mode-tag versus">경쟁 모드</span></div>
     <h2 class="scr-h">${px('trophy',22)} 랭킹</h2>
     <div class="tabs" role="tablist" aria-label="난이도">${tabs}</div>
     <ol class="rank-list">${list}</ol>
-    <p class="footnote">지금은 이 기기의 기록만 보여요. 여러 사람이 함께 보는 랭킹은 다음 단계(서버)에서 만들어요.</p>
     <button class="btn yellow full" data-act="pick-mode" data-m="versus">${px('clock',16)} 경쟁 모드 도전</button></div>`;
 }
 function viewBrief(){
   return `<div class="stack">
-    <div class="brief-day">${MODES[S.mode].t}<b>${esc(D().name)}</b>사건 ${S.run.length}건</div>
+    <div class="brief-day">${MODES[S.mode].t}<b>${esc(D().name)}</b></div>
     <div class="news"><span class="officer sm">${officer(44)}</span><div class="card pxb" style="flex:1"><h3>오늘의 소식</h3><p class="small" style="margin:0;color:var(--white)">누리시에 "택배 주소가 잘못됐다"는 가짜 문자와 가족인 척하는 메시지가 돌고 있대요.</p></div></div>
-    <div class="rulecard pxb"><span class="tag">오늘의 조건</span><h3>${esc(RULE_BY_DIFF[S.diff])}</h3>
-      <div class="example"><span class="ok">${px('check',12)} 좋은 예</span><span>${esc(TODAY.good)}</span><span class="no">${px('cross',12)} 주의</span><span>${esc(TODAY.bad)}</span></div>
-      <p class="term">${esc(TODAY.term)}</p></div>
-    <div class="card pxb"><h3>근무 수칙</h3><p class="small" style="margin:0;color:var(--white)">${versus()?`사건마다 <b style="color:var(--num)">${D().time}초</b> 안에 처리해요. 시간이 다 되면 놓친 것으로 처리되고, 빨리 맞힐수록 점수가 올라가요. `:''}판정이 맞았는지는 근무가 끝난 뒤 한꺼번에 알려 드려요. 위험한 요청을 승인하면 <b style="color:var(--num)">보안 사고</b>로 근무가 바로 끝나요.</p></div>
+    <div class="rulecard pxb"><span class="tag">오늘의 조건</span><h3>${esc(RULE_BY_DIFF[S.diff])}</h3></div>
+    ${versus()?`<div class="card pxb"><h3>${px('clock',14)} 사건당 ${D().time}초</h3></div>`:''}
     <button class="btn full" data-act="begin">업무 시작 ▶</button>
   </div>`;
 }
@@ -689,17 +662,17 @@ function viewDesk(){
     return `<button class="${cls}" data-act="field" data-id="${fid}"><span class="lbl">${esc(f.label)}<span class="marks">${markFor(fid)}</span></span><span class="val ${f.mono?'mono':''}">${esc(f.value)}</span>${f.file&&!UI.mode?`<span class="open-file">${px('clip',10)} 파일 정보 보기 ▸</span>`:''}</button>`;}).join('');
   const clues=S.c.clues.map((c,i)=>`<span class="chip ${c.ok?'ok':'bad'}">${c.ok?'일치':'불일치'} · ${esc(fieldBy(c.a).label)} ↔ ${esc(fieldBy(c.b).label)}<button class="x" data-act="unclue" data-i="${i}" aria-label="단서 지우기">✕</button></span>`).join('')
     +S.c.flags.map(f=>`<span class="chip flag">${px('flag',10)} ${esc(fieldBy(f).label)}</span>`).join('');
-  const modebar=UI.mode==='compare'?`<div class="modebar">${px('mag',14)} ${UI.pick?'두 번째 정보를 눌러요 (다른 탭도 돼요)':'비교할 첫 번째 정보를 눌러요'}<button data-act="mode" data-m="compare">끝내기</button></div>`
-    :UI.mode==='flag'?`<div class="modebar">${px('flag',14)} 의심스러운 정보를 눌러 깃발을 꽂거나 빼요<button data-act="mode" data-m="flag">끝내기</button></div>`:'';
+  const modebar=UI.mode==='compare'?`<div class="modebar">${px('mag',14)} 대조 ${UI.pick?'2':'1'}/2<button data-act="mode" data-m="compare">끝내기</button></div>`
+    :UI.mode==='flag'?`<div class="modebar">${px('flag',14)} 깃발<button data-act="mode" data-m="flag">끝내기</button></div>`:'';
   const P=PEOPLE[k.who];
   return `<div class="scene pxb" aria-label="창구">${sceneArt()}<div class="counter"></div>
       <div class="visitor">${bust(k.who,76)}</div>
       <div class="speech pxb"><div class="who">${esc(P.name)} · ${esc(P.role)}</div><p>"${esc(k.ask)}"</p></div></div>
-    ${S.c.si>0?`<div class="modebar" style="background:var(--teal)">${px('phone',14)} 확인 요청에 대한 답이 도착했어요. 새 자료를 보고 다시 판정해요.</div>`:''}
+    ${S.c.si>0?`<div class="modebar" style="background:var(--teal)">${px('phone',14)} 확인 결과 도착</div>`:''}
     ${modebar}
     <div class="tabs" role="tablist" aria-label="자료">${tabs}</div>
     <article class="doc pxb" aria-label="${esc(doc.title)}"><div class="doc-head">${px(doc.icon,14)} ${esc(doc.title)}<span class="kind">${esc(doc.kind)}</span></div><div class="fields">${fields}</div></article>
-    <section class="tray"><h4>근거 트레이</h4>${clues?`<div class="chips">${clues}</div>`:'<p class="empty-note">대조로 만든 단서와 깃발이 여기에 모여요.</p>'}</section>`;
+    <section class="tray"><h4>근거 트레이</h4>${clues?`<div class="chips">${clues}</div>`:'<p class="empty-note">—</p>'}</section>`;
 }
 function viewDock(){
   const st=stage();
@@ -725,12 +698,12 @@ function renderSheet(){
   const s=UI.sheet, st=S.c&&S.view==='desk'?stage():null; let h='';
   const closeX=`<button class="sheet-x" data-act="close" aria-label="닫기">✕</button>`;
   if(s.type==='rules'){
-    h=`<h3>${px('star',14)} 오늘의 조건</h3><p>${esc(RULE_BY_DIFF[S.diff])}</p><p class="small" style="color:var(--pencil)">${esc(TODAY.detail)}</p>
-      ${S.c&&S.view==='desk'?`<div class="section">이 사건에 적용되는 규칙</div>${kase().rules.map(r=>`<div class="dot-line pxb"><b style="white-space:nowrap">${r}</b><span>${esc(RULES[r])}</span></div>`).join('')}`:''}
+    h=`<h3>${px('star',14)} 오늘의 조건</h3><p>${esc(RULE_BY_DIFF[S.diff])}</p>
+      ${S.c&&S.view==='desk'?`<div class="section">규칙집</div>${kase().rules.map(r=>`<div class="dot-line pxb"><b style="white-space:nowrap">${r}</b><span>${esc(RULES[r])}</span></div>`).join('')}`:''}
       <button class="btn full" data-act="close">닫기</button>`;
   } else if(s.type==='lookup'){
     const L=allDocs().filter(d=>d.lookup&&!S.c.revealed.includes(d.id));
-    h=`<h3>${px('folder',14)} 자료 조회</h3><p>센터가 이미 가진 자료를 꺼내 봐요. 조회는 몇 번을 해도 괜찮아요.</p>
+    h=`<h3>${px('folder',14)} 자료 조회</h3>
       ${L.map(d=>`<button class="opt pxb" data-act="reveal" data-id="${d.id}">${px(d.icon,16)}<span>${esc(d.lookup)}</span></button>`).join('')}
       <button class="btn ghost full" data-act="close">닫기</button>`;
   } else if(s.type==='decide'){
@@ -746,13 +719,13 @@ function renderSheet(){
     h=`<div class="seal ${s.v==='timeout'?'fail':'neutral'}">${VERDICT[s.v].t}</div><p class="res-sub" style="color:var(--pencil)">${esc(s.msg)}</p>
       <button class="btn full" data-act="next">${S.pendingEnd?'근무 마치기 ▶':'다음 요청 ▶'}</button>`;
   } else if(s.type==='pause'){
-    h=`<h3>${px('pause',14)} 일시정지</h3><p class="small" style="color:var(--pencil)">${versus()&&S.view==='desk'?'경쟁 모드 시간이 멈췄어요.':'잠깐 쉬어도 괜찮아요.'}</p>
+    h=`<h3>${px('pause',14)} 일시정지</h3>
       <button class="btn full" data-act="close">${px('play',14)} 계속하기</button>
       ${settingsRows()}
-      <div class="section">나가기</div>${s.confirmExit?`<p>${versus()?'경쟁 모드는 나가면 이번 도전 기록이 사라져요.':'진행은 저장돼요. 처음 화면의 "이어서 하기"로 돌아올 수 있어요.'} 나갈까요?</p><div class="row"><button class="btn ghost" data-act="close">그만두기</button><button class="btn red" data-act="exit">나가기</button></div>`:`<button class="btn ghost full" data-act="ask-exit">${px('home',14)} 처음 화면으로 나가기</button>`}`;
+      <div class="section">나가기</div>${s.confirmExit?`<p>${versus()?'이번 도전 기록이 사라져요. ':''}나갈까요?</p><div class="row"><button class="btn ghost" data-act="close">그만두기</button><button class="btn red" data-act="exit">나가기</button></div>`:`<button class="btn ghost full" data-act="ask-exit">${px('home',14)} 처음 화면으로 나가기</button>`}`;
   } else if(s.type==='settings'){
     h=`${closeX}<h3>${px('gear',14)} 설정</h3>${settingsRows()}
-      <div class="section">기록</div>${s.confirmReset?`<p>진행과 랭킹 기록이 모두 지워져요. 정말 처음부터 할까요?</p><div class="row"><button class="btn ghost" data-act="close">그만두기</button><button class="btn red" data-act="reset">지우기</button></div>`:`<button class="btn ghost full" data-act="ask-reset">기록 초기화</button>`}
+      <div class="section">기록</div>${s.confirmReset?`<p>진행과 랭킹 기록을 모두 지울까요?</p><div class="row"><button class="btn ghost" data-act="close">그만두기</button><button class="btn red" data-act="reset">지우기</button></div>`:`<button class="btn ghost full" data-act="ask-reset">기록 초기화</button>`}
       <button class="btn full" style="margin-top:12px" data-act="close">닫기</button>`;
   }
   return `<div class="veil" data-act="veil"><div class="sheet" role="dialog" aria-modal="true">${h}</div></div>`;
@@ -766,10 +739,10 @@ function tapField(fid){
     if(!UI.pick){UI.pick=fid;blip('tap');render();return;}
     if(UI.pick===fid){UI.pick=null;render();return;}
     const a=fieldBy(UI.pick),b=f;
-    if(!a.ck||!b.ck||a.ck!==b.ck){toast('이 두 정보는 서로 비교하기 어려워요. 같은 종류끼리 골라 봐요.');UI.pick=null;render();return;}
+    if(!a.ck||!b.ck||a.ck!==b.ck){toast('비교할 수 없는 정보');UI.pick=null;render();return;}
     const pair=[UI.pick,fid].sort().join();
-    if(!S.c.clues.some(c=>[c.a,c.b].sort().join()===pair)){const ok=same(a.cv,b.cv);S.c.clues.push({a:UI.pick,b:fid,ok});blip('tap');toast(ok?'일치: 두 정보가 같아요':'불일치: 두 정보가 달라요');}
-    else toast('이미 비교한 정보예요.');
+    if(!S.c.clues.some(c=>[c.a,c.b].sort().join()===pair)){const ok=same(a.cv,b.cv);S.c.clues.push({a:UI.pick,b:fid,ok});blip('tap');toast(ok?'일치':'불일치');}
+    else toast('이미 비교함');
     UI.pick=null;save();render();return;
   }
   if(f.file){S.c.revealed.includes(f.file)||S.c.revealed.push(f.file);UI.tab=f.file;markSeen(f.file);save();render();}
@@ -794,11 +767,11 @@ function decide(v,rs,route,report){
   if(v==='verify'&&st.next){
     const docs=(routeOk?st.next.docs:(st.next.altDocs||st.next.docs)).map(d=>Object.assign({fresh:1},d));
     c.altPath=!routeOk; c.extraDocs=c.extraDocs.concat(docs); c.si++; c.flags=[];
-    UI.tab=docs[0].id; markSeen(UI.tab); save(); render(); toast('확인 요청에 대한 답이 왔어요.'); return;
+    UI.tab=docs[0].id; markSeen(UI.tab); save(); render(); toast('확인 결과 도착'); return;
   }
   finishCase();
   if(S.ri+1<S.run.length){S.ri++;S.ci=S.run[S.ri];S.c=newCaseState();UI.tab=null;}else S.pendingEnd=true;
-  const msg=v==='timeout'?'시간이 다 됐어요. 이 요청은 처리하지 못했어요.':v==='verify'?'확인 요청을 보냈어요. 답은 근무가 끝나면 함께 알려 드려요.':v==='reject'?(report?'거부하고 신고했어요.':'거부하고 안내했어요.'):'승인했어요.';
+  const msg=v==='timeout'?'처리하지 못했어요.':v==='verify'?'확인 요청을 보냈어요.':v==='reject'?(report?'거부하고 신고했어요.':'거부하고 안내했어요.'):'승인했어요.';
   UI.sheet={type:'processed',v,msg}; save(); render();
 }
 function finishCase(){S.results.push({id:kase().id,ci:S.ci,log:S.c.stageLog,extraDocs:S.c.extraDocs});}
@@ -835,8 +808,7 @@ function endDay(reason){
     const list=(S.ranks[S.diff]||[]).map(r=>Object.assign({},r,{last:false}));
     list.push({nick:S.nick,score:total,acc:Math.round(ok/n*100),date,last:true});
     list.sort((a,b)=>b.score-a.score); S.ranks[S.diff]=list.slice(0,10);
-    const all=S.ranks[S.diff].concat(DEMO_RANKS[S.diff]).sort((a,b)=>b.score-a.score);
-    rank=all.findIndex(r=>r.last)+1||null;
+    rank=S.ranks[S.diff].findIndex(r=>r.last)+1||null;
   }
   S.end={reason:why||'pass',failed,total,acc:Math.round(ok/n*100),passRate,timeBonus,rank};
   S.view='end';UI.sheet=null;UI.mode=null;UI.open=failed&&why==='incident'?S.results.length-1:null;save();render();
@@ -856,9 +828,9 @@ function viewEnd(){
   const word=v=>v>=80?'튼튼해요':v>=50?'보통이에요':'조금 아쉬워요';
   const head=E.failed
     ?`<div class="seal fail">${E.reason==='incident'?'보안 사고':'점검 미달'}</div><h2 class="res-title">${E.reason==='incident'?'위험한 요청이 승인됐어요':'이번 근무는 다시 해 봐요'}</h2>
-      <p class="res-sub">${E.reason==='incident'?'센터가 바로 막아서 피해는 없었어요. 아래에서 무엇을 놓쳤는지 보고, 처음부터 다시 해요.':`바르게 처리한 비율이 ${E.passRate}%예요. ${PASS_RATE}% 이상이면 통과예요. 해설을 보고 처음부터 다시 해요.`}</p>`
+      <p class="res-sub">${E.reason==='incident'?'처음부터 다시':`처리 성공률 ${E.passRate}% · 통과 기준 ${PASS_RATE}%`}</p>`
     :`<div class="brief-day" style="text-align:center">${esc(D().name)} · ${MODES[S.mode].t} 완료</div><div class="stars" aria-label="별 ${stars}개">${[1,2,3].map(i=>px('star',34,i<=stars?'#F7D84A':'#7F9CC9')).join('')}</div>`;
-  const rankCard=versus()?`<div class="rank-card pxb">${px('trophy',22)}<div><b>${E.total}점</b><span>${E.rank?`${esc(D().name)} 랭킹 ${E.rank}위 · 시간 보너스 +${E.timeBonus}`:'보안 사고 기록은 랭킹에 오르지 않아요'}</span></div></div>`:'';
+  const rankCard=versus()?`<div class="rank-card pxb">${px('trophy',22)}<div><b>${E.total}점</b><span>${E.rank?`${esc(D().name)} 랭킹 ${E.rank}위 · 시간 보너스 +${E.timeBonus}`:'랭킹 미등록'}</span></div></div>`:'';
   const metrics=`<div class="card pxb"><div class="metrics">
       <span>판정 정확도</span><span>${E.acc}%</span><span>위험 탐지율</span><span>${det}% (${reqF}/${reqT})</span>
       <span>과잉 차단</span><span>${over}건</span><span>위험 승인</span><span>${riskApp.length}건</span>
@@ -869,19 +841,17 @@ function viewEnd(){
     const k=CASES[r.ci];
     return r.log.map((g,j)=>{
       const st=k.stages[g.si], good=g.outcome!=='wrong';
-      const tag=g.outcome==='correct'?'<span class="mk ok">맞음</span>':g.outcome==='alt'?'<span class="mk bad">더 좋은 답 있음</span>':'<span class="mk flag">다시 볼 곳</span>';
+      const tag=g.outcome==='correct'?'<span class="mk ok">맞음</span>':g.outcome==='alt'?'<span class="mk bad">더 좋은 답 있음</span>':'<span class="mk flag">틀림</span>';
       const open=UI.open===idx;
       const risks=g.risk.length?g.risk.map(rk=>`<span class="chip ${g.flags.includes(rk.f)?'ok':'flag'}">${g.flags.includes(rk.f)?'찾음':'못 찾음'} · ${esc(rk.label)}</span>`).join(''):'<span class="chip">위험 요소 없음 · 정상 요청</span>';
       const reasons=st.reasons&&g.verdict!=='approve'?`<h4>올바른 근거</h4><div class="risk-list">${st.reasons.filter(x=>x.ok).map(x=>`<span class="chip ok">${px('check',10)} ${esc(x.t)}</span>`).join('')}</div>`:'';
       const route=g.verdict==='verify'&&st.routes?`<p><b>확인 경로:</b> ${g.routeOk?'공식 경로로 잘 확인했어요.':esc((st.routes.find((x,i)=>i===g.route)||{}).why||'원래 알던 공식 경로로 확인해야 해요.')}</p>`:'';
       const vres=st.verifyResult&&g.verdict==='verify'&&!st.next?`<div class="result-card pxb" style="white-space:pre-line">${px('phone',12)} 확인 결과\n${esc(st.verifyResult)}</div>`:'';
-      const rep=g.verdict==='reject'&&g.reportable!==undefined?`<p>${g.report===!!g.reportable?'신고 판단도 정확했어요.':(g.reportable?'사칭·피싱은 신고하면 다른 사람도 지킬 수 있어요.':'이 경우는 신고보다 다시 하도록 안내하는 게 맞아요.')}</p>`:'';
-      const hk=g.verdict==='timeout'?(st.correct==='approve'?'reject':'approve'):g.verdict;
-      const hint=!good&&st.hints&&st.hints[hk]?`<p><b>다시 볼 곳:</b> ${esc(st.hints[hk])}</p>`:'';
+      const rep=g.verdict==='reject'&&g.reportable!==undefined?`<p><b>신고 판단:</b> ${g.report===!!g.reportable?'맞음':'틀림'}</p>`:'';
       const epi=good?st.epi.ok:st.epi.bad;
       const title=`${esc(k.title)}${k.stages.length>1?` · ${g.si+1}단계`:''}`;
       return `<div class="review pxb ${good?'':'bad'}"><button class="rv-head" data-act="rv" data-i="${idx}" aria-expanded="${open}"><span class="avatar">${face(k.who,28)}</span><span class="rv-t">${title}<small>내 판정 <b>${VERDICT[g.verdict].t}</b> · 정답 <b>${VERDICT[g.correct].t}</b></small></span>${tag}</button>
-        ${open?`<div class="explain">${g.outcome==='alt'&&st.altNote?`<p><b>${esc(st.altNote)}</b></p>`:''}<h4>위험 요소</h4><div class="risk-list">${risks}</div>${reasons}${route}${vres}${hint}<h4>해설</h4><p>${esc(g.altPath&&st.explainAlt?st.explainAlt:st.explain)}</p>${rep}<p class="tip">${px('bubble',12)} 이렇게 해요: ${esc(st.tip)}</p>${epi?`<div class="epi" style="margin-top:10px"><span class="avatar">${face(st.epi.who,28)}</span><div class="say pxb">${esc(epi)}</div></div>`:''}<p class="small" style="color:var(--pencil);margin:8px 0 0">이번 사건 점수 ${g.sc.total}점</p></div>`:''}</div>`;
+        ${open?`<div class="explain">${g.outcome==='alt'&&st.altNote?`<p><b>${esc(st.altNote)}</b></p>`:''}<h4>위험 요소</h4><div class="risk-list">${risks}</div>${reasons}${route}${vres}<h4>해설</h4><p>${esc(g.altPath&&st.explainAlt?st.explainAlt:st.explain)}</p>${rep}${epi?`<div class="epi" style="margin-top:10px"><span class="avatar">${face(st.epi.who,28)}</span><div class="say pxb">${esc(epi)}</div></div>`:''}<p class="small" style="color:var(--pencil);margin:8px 0 0">이번 사건 점수 ${g.sc.total}점</p></div>`:''}</div>`;
     }).join('');
   }).join('');
   const nextOpen=!E.failed&&S.diff<3;
@@ -890,8 +860,7 @@ function viewEnd(){
     :E.failed?`<button class="btn yellow full" data-act="again">처음부터 다시 하기 ▶</button>`
     :`${nextOpen?`<button class="btn full" data-act="next-diff">다음 난이도: ${esc(DIFFS[S.diff+1].name)} ▶</button>`:''}<button class="btn ghost full" data-act="again">이 난이도 다시 하기</button>`;
   return `<div class="stack">${head}${rankCard}${metrics}
-    <div><h4 class="rv-h">사건별 판정과 해설</h4><p class="small" style="margin:0 0 8px">사건을 누르면 정답과 해설이 열려요.</p><div class="stack" style="gap:10px">${review}</div></div>
-    <div class="epi">${officer(44)}<div class="say pxb">${E.failed?'괜찮아요. 해설을 보고 다시 하면 금방 익숙해져요.':over===0&&riskApp.length===0?'막아야 할 것과 열어 줘야 할 것을 잘 구분했어요!':over>0?'정상 요청도 몇 건 막았어요. 낯설다고 다 위험한 건 아니에요.':'놓친 위험이 있었어요. 해설을 다시 보면 금방 익숙해져요.'}</div></div>
+    <div><h4 class="rv-h">사건별 판정과 해설</h4><div class="stack" style="gap:10px">${review}</div></div>
     ${buttons}<button class="btn ghost full" data-act="exit">${px('home',14)} 처음 화면</button></div>`;
 }
 function startRun(d){S.diff=d;Object.assign(S,{view:'brief',run:DIFFS[d].cases.map(id=>CASES.findIndex(c=>c.id===id)),ri:0,results:[],c:null,end:null,pendingEnd:false});S.ci=S.run[0];save();render();}
@@ -902,7 +871,7 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]'); if(!el)return;
   const a=el.dataset.act;
   if(a==='veil'){if(e.target===el&&UI.sheet&&['rules','lookup','settings','decide','pause'].includes(UI.sheet.type)){UI.sheet=null;render();}return;}
-  if(el.disabled||el.getAttribute('aria-disabled')==='true'){if(a==='lookup')toast('이 사건에서 더 꺼낼 자료가 없어요.');if(a==='pick-diff')toast('앞 난이도를 통과하면 열려요.');return;}
+  if(el.disabled||el.getAttribute('aria-disabled')==='true'){if(a==='lookup')toast('조회할 자료 없음');if(a==='pick-diff')toast('잠김');return;}
   if(!['field','reason','route','report','tab'].includes(a))blip('tap');
   switch(a){
     case 'nick':S.nick=pickNick();save();render();break;
@@ -928,7 +897,7 @@ document.addEventListener('click',e=>{
     case 'mode':{const m=el.dataset.m;UI.mode=UI.mode===m?null:m;UI.pick=null;render();break;}
     case 'field':tapField(el.dataset.id);break;
     case 'unclue':e.stopPropagation();S.c.clues.splice(+el.dataset.i,1);save();render();break;
-    case 'reveal':{const id=el.dataset.id;S.c.revealed.push(id);UI.tab=id;markSeen(id);UI.sheet=null;save();render();toast('자료를 꺼냈어요.');break;}
+    case 'reveal':{const id=el.dataset.id;S.c.revealed.push(id);UI.tab=id;markSeen(id);UI.sheet=null;save();render();toast('자료 추가');break;}
     case 'verdict':onVerdict(el.dataset.v);break;
     case 'reason':{const i=+el.dataset.i,rs=UI.sheet.rs,k=rs.indexOf(i);k>=0?rs.splice(k,1):rs.push(i);render();break;}
     case 'route':UI.sheet.route=+el.dataset.i;render();break;
@@ -952,7 +921,6 @@ function start(data){
   if(S.view==='desk'&&!S.c)S.view='brief';
   if(S.view==='end'&&!S.end)S.view='title';
   if(S.view==='desk'&&versus()){S.view='title';S.c=null;S.resumeView=null;} // a versus run cannot be resumed after reload
-  ['mag','flag','folder','book'].forEach(n=>{const el=document.getElementById('lg-'+n);if(el)el.innerHTML=px(n,16,'#45C7C1');});
   render();
 }
 if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(()=>({S}));
