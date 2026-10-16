@@ -1,4 +1,4 @@
-<title>DIGITAL GUARD 도트 시제품</title>
+<title>Data, Please. 도트 시제품</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: a portrait handheld "security terminal" centered on the page. No tutorial or helper copy inside the game (v0.4). Two moods: dark (night shift, default) and light (day shift), chosen in settings. */
@@ -603,7 +603,7 @@ function viewTitle(){
   const resume=S.resumeView&&S.c&&S.mode==='normal'&&['brief','desk','end'].includes(S.resumeView);
   return `<section class="title">
     <div class="mainbar">${soundBtn()}<button class="hud-btn pxb" data-act="settings" aria-label="설정">${px('gear',16)}<span>설정</span></button></div>
-    <div><p class="logo">DIGITAL<br><span>GUARD</span></p><p class="slogan">의심하고, 확인하고, 판단하라.</p></div>
+    <div><p class="logo">DATA,<br><span>PLEASE.</span></p><p class="slogan">의심하고, 확인하고, 판단하라.</p></div>
     <div class="hero-scene pxb"><span class="officer">${officer(76)}</span><div class="bubble pxb">어서 와요! 오늘도 수상한 요청을 가려내 볼까요?<span class="by">${dot(26)} 도트</span></div></div>
     <div class="stack">
       ${resume?`<button class="btn yellow full" data-act="resume">이어서 하기 · ${esc(D().name)}</button>`:''}

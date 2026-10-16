@@ -1,4 +1,4 @@
-# DIGITAL GUARD 도트 시제품
+# Data, Please. 도트 시제품
 
 [← 기획서 목차로](../README.md)
 

@@ -1,10 +1,10 @@
-# DIGITAL GUARD (가칭)
+# Data, Please.
 
 > Unity 6 기반 모바일(Android · iOS) 추리 퍼즐·시뮬레이션 게임 **상세 기획서**
 
 | 항목 | 내용 |
 |---|---|
-| 프로젝트명 | DIGITAL GUARD (가칭) |
+| 게임 이름 | **Data, Please.** (v0.4 확정, 이전 가칭 DIGITAL GUARD) |
 | 플랫폼 | Android, iOS (세로 화면 기본) |
 | 엔진 | Unity 6 (C#) |
 | 장르 | 추리 퍼즐 · 심사 시뮬레이션 (소재: 생활 속 사칭·피싱) |
@@ -39,7 +39,7 @@
 | 부록 | 보안 규칙 목록 · 용어 사전 · 가상 데이터 작성 원칙 · 게임 이름 후보 · 확장자 도감 | [10-appendix.md](10-appendix.md) |
 | 플레이 가이드 | 게임 밖 설명: 조작 · 규칙 · 점수 · 모드 · 난이도 · 이름과 기록 (인게임에는 넣지 않음) | [play-guide.md](play-guide.md) |
 | 시제품 | 도트 스타일 HTML 시제품 v0.4 (메인·일반/경쟁 모드·난이도 4단계·창구형 인게임·랭킹·어둡게/밝게) | [prototype/digital-guard-pixel.html](prototype/digital-guard-pixel.html) · [만드는 법](prototype/README.md) |
-| 발표 | 중간 설계발표 PPT v0.4 (20장) · 기획 피치 PPT (9장, v0.3), 모두 도트 스타일·슬라이드 노트 포함 | [presentation/DIGITAL_GUARD_중간설계발표.pptx](presentation/DIGITAL_GUARD_중간설계발표.pptx) · [presentation/DIGITAL_GUARD_기획발표.pptx](presentation/DIGITAL_GUARD_기획발표.pptx) · [글꼴 안내](presentation/README.md) |
+| 발표 | 중간 설계발표 PPT v0.4 (20장) · 기획 피치 PPT (9장, v0.3 · 이전 가칭 DIGITAL GUARD), 모두 도트 스타일·슬라이드 노트 포함 | [presentation/DataPlease_중간설계발표.pptx](presentation/DataPlease_중간설계발표.pptx) · [presentation/DIGITAL_GUARD_기획발표.pptx](presentation/DIGITAL_GUARD_기획발표.pptx) · [글꼴 안내](presentation/README.md) |
 
 ---
 
@@ -66,6 +66,7 @@
 - **창구형 인게임**(Papers, Please 구도): 창밖 배경 + 상대방 + 문자·메일 내용 말풍선
 - **일시정지**: 계속하기·소리·분위기·글자 크기·나가기
 - **분위기 어둡게(밤)·밝게(낮)** 선택, 창구는 플레이어 한 명이 담당
+- 게임 이름 **Data, Please.** 확정 ([부록 D](10-appendix.md#d-게임-이름-후보-v02))
 - 호칭은 "심사관" 대신 **플레이어**로 통일, 교육용이 아닌 **게임**으로 포지셔닝, 인게임 튜토리얼·안내 문구는 모두 빼고 발표 자료의 "플레이 가이드"로 분리 ([15.10](11-modes-and-ui.md#1510-게임으로서의-정리-v04))
 - 자세한 내용: [15장](11-modes-and-ui.md)
 

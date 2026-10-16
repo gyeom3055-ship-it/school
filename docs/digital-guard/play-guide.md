@@ -1,4 +1,4 @@
-# DIGITAL GUARD 플레이 가이드 (게임 밖 설명)
+# Data, Please. 플레이 가이드 (게임 밖 설명)
 
 [← 목차로](README.md)
 
